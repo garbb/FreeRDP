@@ -54,9 +54,16 @@ static BOOL wf_scale_mouse_event_ex(wfContext* wfc, UINT16 flags, UINT16 buttonM
 static BOOL g_flipping_in;
 static BOOL g_flipping_out;
 
+static BOOL alt_pressed = FALSE;
+static BOOL ctrl_pressed = FALSE;
+static DWORD last_key_up = 0;
+
 static BOOL alt_ctrl_down()
 {
-	return ((GetAsyncKeyState(VK_CONTROL) & 0x8000) || (GetAsyncKeyState(VK_MENU) & 0x8000));
+	BOOL ret = (ctrl_pressed && alt_pressed);
+	DEBUG_KBD("alt_ctrl_down() %d", ret);
+	return ret;
+	// return ((GetAsyncKeyState(VK_CONTROL) & 0x8000) || (GetAsyncKeyState(VK_MENU) & 0x8000));
 }
 
 LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -113,7 +120,41 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 				rdp_scancode = MAKE_RDP_SCANCODE((BYTE)p->scanCode, p->flags & LLKHF_EXTENDED);
 				DEBUG_KBD("keydown %d scanCode 0x%08lX flags 0x%08lX vkCode 0x%08lX",
 				          (wParam == WM_KEYDOWN), p->scanCode, p->flags, p->vkCode);
-				DEBUG_KBD("GetAsyncKeyState(VK_CONTROL)=%d, GetAsyncKeyState(VK_MENU)=%d", GetAsyncKeyState(VK_CONTROL), GetAsyncKeyState(VK_MENU));
+				// DEBUG_KBD("GetAsyncKeyState(VK_CONTROL)=%d, GetAsyncKeyState(VK_MENU)=%d", GetAsyncKeyState(VK_CONTROL), GetAsyncKeyState(VK_MENU));
+				
+				switch (p->vkCode)
+				{
+					case VK_LMENU:
+					case VK_RMENU:
+						alt_pressed = (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN);
+						DEBUG_KBD("alt_pressed=%d", alt_pressed);
+						
+						if ((wParam == WM_SYSKEYUP || wParam == WM_KEYUP) && (last_key_up == VK_LCONTROL || last_key_up == VK_RCONTROL) && !ctrl_pressed)
+						{
+							last_key_up = 0;
+							DEBUG_KBD("DEFOCUS");
+						}
+						
+						// last_key_up = ctrl_pressed ? p->vkCode : 0;
+					break;
+					
+					case VK_LCONTROL:
+					case VK_RCONTROL:
+						ctrl_pressed = (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN);
+						DEBUG_KBD("ctrl_pressed=%d", ctrl_pressed);
+						
+						DEBUG_KBD("last_key_up=%d", last_key_up);
+						if ((wParam == WM_SYSKEYUP || wParam == WM_KEYUP) && (last_key_up == VK_LMENU || last_key_up == VK_RMENU) && !alt_pressed)
+						{
+							last_key_up = 0;
+							DEBUG_KBD("DEFOCUS");
+						}
+						
+						// last_key_up = alt_pressed ? p->vkCode : 0;
+					break;
+				}
+				
+				if (wParam == WM_KEYUP || wParam == WM_SYSKEYUP) last_key_up = p->vkCode;
 
 				if (wfc->fullscreen_toggle &&
 				    ((p->vkCode == VK_RETURN) || (p->vkCode == VK_CANCEL)) &&
