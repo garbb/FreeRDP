@@ -67,7 +67,7 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 	DWORD rdp_scancode;
 	rdpInput* input;
 	PKBDLLHOOKSTRUCT p;
-	DEBUG_KBD("Low-level keyboard hook, hWnd %X nCode %X wParam %X", g_focus_hWnd, nCode, wParam);
+	if (g_focus_hWnd) DEBUG_KBD("Low-level keyboard hook, hWnd %X nCode %X wParam %X", g_focus_hWnd, nCode, wParam);
 
 	if (g_flipping_in)
 	{
@@ -113,15 +113,19 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 				rdp_scancode = MAKE_RDP_SCANCODE((BYTE)p->scanCode, p->flags & LLKHF_EXTENDED);
 				DEBUG_KBD("keydown %d scanCode 0x%08lX flags 0x%08lX vkCode 0x%08lX",
 				          (wParam == WM_KEYDOWN), p->scanCode, p->flags, p->vkCode);
+				DEBUG_KBD("GetAsyncKeyState(VK_CONTROL)=%d, GetAsyncKeyState(VK_MENU)=%d", GetAsyncKeyState(VK_CONTROL), GetAsyncKeyState(VK_MENU));
 
 				if (wfc->fullscreen_toggle &&
 				    ((p->vkCode == VK_RETURN) || (p->vkCode == VK_CANCEL)) &&
+					// p->flags & LLKHF_ALTDOWN)
 				    (GetAsyncKeyState(VK_CONTROL) & 0x8000) &&
 				    (GetAsyncKeyState(VK_MENU) & 0x8000)) /* could also use flags & LLKHF_ALTDOWN */
 				{
+					// if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
 					if (wParam == WM_KEYDOWN)
 					{
 						wf_toggle_fullscreen(wfc);
+						// encomsp_toggle_control(wfc->encomsp);
 						return 1;
 					}
 				}
@@ -174,6 +178,7 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 	{
 		if (!alt_ctrl_down())
 		{
+			WLog_DBG("wf_event", "if (g_flipping_out){...}");
 			g_flipping_out = FALSE;
 			g_focus_hWnd = NULL;
 		}
@@ -246,6 +251,8 @@ static BOOL wf_event_process_WM_MOUSEWHEEL(wfContext* wfc, HWND hWnd, UINT Msg, 
 
 static void wf_sizing(wfContext* wfc, WPARAM wParam, LPARAM lParam)
 {
+	WLog_VRB("wf_event", "wf_sizing()");
+	
 	rdpSettings* settings = wfc->common.context.settings;
 	// Holding the CTRL key down while resizing the window will force the desktop aspect ratio.
 	LPRECT rect;
@@ -285,6 +292,8 @@ static void wf_sizing(wfContext* wfc, WPARAM wParam, LPARAM lParam)
 
 static void wf_send_resize(wfContext* wfc)
 {
+	WLog_VRB("wf_event", "wf_send_resize");
+	
 	RECT windowRect;
 	int targetWidth = wfc->client_width;
 	int targetHeight = wfc->client_height;
@@ -353,10 +362,13 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 		if (!g_main_hWnd)
 			g_main_hWnd = wfc->hwnd;
+			
+		// WLog_VRB("wf_event", "%d", Msg);
 
 		switch (Msg)
 		{
 			case WM_MOVE:
+				WLog_VRB("wf_event", "WM_MOVE");
 				if (!wfc->disablewindowtracking)
 				{
 					int x = (int)(short)LOWORD(lParam);
@@ -368,6 +380,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 				break;
 
 			case WM_GETMINMAXINFO:
+				WLog_VRB("wf_event", "WM_GETMINMAXINFO");
 				if (wfc->common.context.settings->SmartSizing ||
 				    wfc->common.context.settings->DynamicResolutionUpdate)
 				{
@@ -393,10 +406,12 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 				break;
 
 			case WM_SIZING:
+				WLog_VRB("wf_event", "WM_SIZING");
 				wf_sizing(wfc, lParam, wParam);
 				break;
 
 			case WM_SIZE:
+				WLog_VRB("wf_event", "WM_SIZE %d,%d", LOWORD(lParam), HIWORD(lParam));
 				GetWindowRect(wfc->hwnd, &windowRect);
 
 				if (!wfc->fullscreen)
@@ -436,15 +451,20 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 				break;
 
 			case WM_EXITSIZEMOVE:
+				WLog_VRB("wf_event", "WM_EXITSIZEMOVE");
 				wf_size_scrollbars(wfc, wfc->client_width, wfc->client_height);
 				wf_send_resize(wfc);
 				break;
 
 			case WM_ERASEBKGND:
+				WLog_VRB("wf_event", "WM_ERASEBKGND");
 				/* Say we handled it - prevents flickering */
 				return (LRESULT)1;
 
 			case WM_PAINT:
+				WLog_VRB("wf_event", "WM_PAINT");
+				// DEBUG_KBD("GetAsyncKeyState(VK_CONTROL)=%d, GetAsyncKeyState(VK_MENU)=%d", GetAsyncKeyState(VK_CONTROL), GetAsyncKeyState(VK_MENU));
+								
 				hdc = BeginPaint(hWnd, &ps);
 				x = ps.rcPaint.left;
 				y = ps.rcPaint.top;
@@ -454,6 +474,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 				             x - wfc->offset_x + wfc->xCurrentScroll,
 				             y - wfc->offset_y + wfc->yCurrentScroll, SRCCOPY);
 				EndPaint(hWnd, &ps);
+				
 				break;
 #if (_WIN32_WINNT >= 0x0500)
 
@@ -531,6 +552,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 			case WM_HSCROLL:
 			{
+				WLog_VRB("wf_event", "WM_HSCROLL");
 				int xDelta;  // xDelta = new_pos - current_pos
 				int xNewPos; // new position
 				int yDelta = 0;
@@ -600,6 +622,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 			case WM_VSCROLL:
 			{
+				WLog_VRB("wf_event", "WM_VSCROLL");
 				int xDelta = 0;
 				int yDelta;  // yDelta = new_pos - current_pos
 				int yNewPos; // new position
@@ -678,6 +701,10 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 					              wfc->common.context.settings->SmartSizing ? MF_CHECKED
 					                                                        : MF_UNCHECKED);
 				}
+				else if  (wParam == SYSCOMMAND_ID_REQUEST_CONTROL)
+				{
+					encomsp_request_control(wfc, TRUE);
+				}
 				else
 				{
 					processed = FALSE;
@@ -701,11 +728,14 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 	switch (Msg)
 	{
 		case WM_DESTROY:
+			WLog_VRB("wf_event", "WM_DESTROY");
 			PostQuitMessage(WM_QUIT);
 			break;
 
 		case WM_SETFOCUS:
+			WLog_VRB("wf_event", "WM_SETFOCUS");
 			DEBUG_KBD("getting focus %X", hWnd);
+			freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, FALSE);
 
 			if (alt_ctrl_down())
 				g_flipping_in = TRUE;
@@ -715,10 +745,12 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 			break;
 
 		case WM_KILLFOCUS:
+			WLog_VRB("wf_event", "WM_KILLFOCUS");
+			freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, TRUE);
 			if (g_focus_hWnd == hWnd && wfc && !wfc->fullscreen)
 			{
 				DEBUG_KBD("loosing focus %X", hWnd);
-
+				
 				if (alt_ctrl_down())
 					g_flipping_out = TRUE;
 				else
@@ -729,6 +761,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 		case WM_ACTIVATE:
 		{
+			WLog_VRB("wf_event", "WM_ACTIVATE");
 			int activate = (int)(short)LOWORD(wParam);
 
 			if (activate != WA_INACTIVE)

@@ -133,6 +133,8 @@ static void wf_Bitmap_Free(rdpContext* context, rdpBitmap* bitmap)
 
 static BOOL wf_Bitmap_Paint(rdpContext* context, rdpBitmap* bitmap)
 {
+	WLog_DBG("wf_graphics", "wf_Bitmap_Paint");
+
 	BOOL rc;
 	UINT32 width, height;
 	wfContext* wfc = (wfContext*)context;

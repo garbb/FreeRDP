@@ -93,6 +93,8 @@ static BOOL update_read_bitmap_data(rdpUpdate* update, wStream* s, BITMAP_DATA* 
 	Stream_Read_UINT16(s, bitmapData->bitsPerPixel);
 	Stream_Read_UINT16(s, bitmapData->flags);
 	Stream_Read_UINT16(s, bitmapData->bitmapLength);
+	
+	WLog_VRB("update", "update_read_bitmap_data %d,%d,%d,%d,%d,%d", bitmapData->destLeft, bitmapData->destTop, bitmapData->destRight, bitmapData->destBottom, bitmapData->width, bitmapData->height);
 
 	if ((bitmapData->width == 0) || (bitmapData->height == 0))
 	{

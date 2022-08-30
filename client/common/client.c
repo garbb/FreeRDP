@@ -340,6 +340,7 @@ int freerdp_client_settings_parse_assistance_file(rdpSettings* settings, int arg
 {
 	int status, x;
 	int ret = -1;
+	BOOL pop_ret;
 	char* filename;
 	char* password = NULL;
 	rdpAssistanceFile* file;
@@ -363,11 +364,16 @@ int freerdp_client_settings_parse_assistance_file(rdpSettings* settings, int arg
 		return -1;
 
 	status = freerdp_assistance_parse_file(file, filename, password);
+	WLog_DBG(TAG, "freerdp_assistance_parse_file status=%d", status);
 
 	if (status < 0)
 		goto out;
 
-	if (!freerdp_assistance_populate_settings_from_assistance_file(file, settings))
+	// if (!freerdp_assistance_populate_settings_from_assistance_file(file, settings))
+		// goto out;
+	pop_ret = freerdp_assistance_populate_settings_from_assistance_file(file, settings);
+	WLog_DBG(TAG, "freerdp_assistance_populate_settings_from_assistance_file return=%d", pop_ret);
+	if (!pop_ret)
 		goto out;
 
 	ret = 0;

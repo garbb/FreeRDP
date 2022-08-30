@@ -56,6 +56,7 @@ extern "C"
 
 // System menu constants
 #define SYSCOMMAND_ID_SMARTSIZING 1000
+#define SYSCOMMAND_ID_REQUEST_CONTROL 1001
 
 	typedef struct
 	{
@@ -80,6 +81,7 @@ extern "C"
 		int offset_y;
 		int fullscreen_toggle;
 		int fullscreen;
+		BOOL controlToggle;
 		int percentscreen;
 		WCHAR* window_title;
 		int client_x;
@@ -129,6 +131,8 @@ extern "C"
 
 		void* clipboard;
 		CliprdrClientContext* cliprdr;
+		
+		EncomspClientContext* encomsp;
 
 		wfFloatBar* floatbar;
 

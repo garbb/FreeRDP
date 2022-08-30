@@ -31,6 +31,107 @@
 #include <freerdp/log.h>
 #define TAG CLIENT_TAG("windows")
 
+// BOOL encomsp_toggle_control(EncomspClientContext* encomsp, BOOL control)
+// {
+	// ENCOMSP_CHANGE_PARTICIPANT_CONTROL_LEVEL_PDU pdu;
+
+	// if (!encomsp)
+		// return FALSE;
+
+	// pdu.ParticipantId = 0;
+	// pdu.Flags = ENCOMSP_REQUEST_VIEW;
+
+	// if (control)
+		// pdu.Flags |= ENCOMSP_REQUEST_INTERACT;
+
+	// encomsp->ChangeParticipantControlLevel(encomsp, &pdu);
+	// return TRUE;
+// }
+
+BOOL encomsp_request_control(wfContext* wf, BOOL request)
+{
+	ENCOMSP_CHANGE_PARTICIPANT_CONTROL_LEVEL_PDU pdu;
+	
+	EncomspClientContext* encomsp = wf->encomsp;
+
+	if (!encomsp)
+		return FALSE;
+		
+	// wfContext* wf = (wfContext*)encomsp->custom;
+	if (!wf->common.context.settings->RemoteAssistanceMode)
+		return FALSE;
+
+	pdu.ParticipantId = 0;
+	pdu.Flags = ENCOMSP_REQUEST_VIEW;
+	
+	if (request)
+		pdu.Flags |= ENCOMSP_REQUEST_INTERACT;
+
+	encomsp->ChangeParticipantControlLevel(encomsp, &pdu);
+	return TRUE;
+}
+
+BOOL encomsp_toggle_control(EncomspClientContext* encomsp)
+{
+	wfContext* wf = (wfContext*)encomsp->custom;
+
+	encomsp_request_control(wf, !wf->controlToggle);
+
+	wf->controlToggle = !wf->controlToggle;
+}
+
+static UINT
+wf_encomsp_participant_created(EncomspClientContext* context,
+                                const ENCOMSP_PARTICIPANT_CREATED_PDU* participantCreated)
+{
+	wfContext* wf;
+	rdpSettings* settings;
+	BOOL request;
+	static BOOL requestedOnce = FALSE;
+
+	if (!context || !context->custom || !participantCreated)
+		return ERROR_INVALID_PARAMETER;
+
+	wf = (wfContext*)context->custom;
+	WINPR_ASSERT(wf);
+
+	settings = wf->common.context.settings;
+
+	if (!settings)
+		return ERROR_INVALID_PARAMETER;
+
+	request = freerdp_settings_get_bool(settings, FreeRDP_RemoteAssistanceRequestControl);
+	if (!requestedOnce && request && (participantCreated->Flags & ENCOMSP_MAY_VIEW) &&
+	    !(participantCreated->Flags & ENCOMSP_MAY_INTERACT))
+	{
+		// if (!encomsp_toggle_control(context, TRUE))
+		requestedOnce = TRUE;
+		if (!encomsp_toggle_control(context))
+			return ERROR_INTERNAL_ERROR;
+	}
+
+	return CHANNEL_RC_OK;
+}
+
+static void wf_encomsp_init(wfContext* wf, EncomspClientContext* encomsp)
+{
+	wf->encomsp = encomsp;
+	encomsp->custom = (void*)wf;
+	encomsp->ParticipantCreated = wf_encomsp_participant_created;
+}
+
+static void wf_encomsp_uninit(wfContext* wf, EncomspClientContext* encomsp)
+{
+	if (encomsp)
+	{
+		encomsp->custom = NULL;
+		encomsp->ParticipantCreated = NULL;
+	}
+
+	if (wf)
+		wf->encomsp = NULL;
+}
+
 void wf_OnChannelConnectedEventHandler(void* context, const ChannelConnectedEventArgs* e)
 {
 	wfContext* wfc = (wfContext*)context;
@@ -52,6 +153,7 @@ void wf_OnChannelConnectedEventHandler(void* context, const ChannelConnectedEven
 	}
 	else if (strcmp(e->name, ENCOMSP_SVC_CHANNEL_NAME) == 0)
 	{
+		wf_encomsp_init(wfc, (EncomspClientContext*)e->pInterface);
 	}
 	else if (strcmp(e->name, DISP_DVC_CHANNEL_NAME) == 0)
 	{
@@ -82,6 +184,7 @@ void wf_OnChannelDisconnectedEventHandler(void* context, const ChannelDisconnect
 	}
 	else if (strcmp(e->name, ENCOMSP_SVC_CHANNEL_NAME) == 0)
 	{
+		wf_encomsp_uninit(wfc, (EncomspClientContext*)e->pInterface);
 	}
 	else if (strcmp(e->name, DISP_DVC_CHANNEL_NAME) == 0)
 	{

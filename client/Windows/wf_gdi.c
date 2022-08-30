@@ -209,8 +209,10 @@ static HBRUSH wf_create_brush(wfContext* wfc, rdpBrush* brush, UINT32 color, UIN
 	return br;
 }
 
-static BOOL wf_scale_rect(wfContext* wfc, RECT* source)
+BOOL wf_scale_rect(wfContext* wfc, RECT* source)
 {
+	WLog_VRB("wf_gdi", "wf_scale_rect");
+
 	UINT32 ww, wh, dw, dh;
 	rdpSettings* settings;
 
@@ -257,6 +259,8 @@ static BOOL wf_scale_rect(wfContext* wfc, RECT* source)
 
 void wf_invalidate_region(wfContext* wfc, UINT32 x, UINT32 y, UINT32 width, UINT32 height)
 {
+	WLog_VRB("wf_gdi", "wf_invalidate_region %d,%d,%d,%d", x, y, width, height);
+
 	RECT rect;
 	rdpGdi* gdi = wfc->common.context.gdi;
 	wfc->update_rect.left = x + wfc->offset_x;
@@ -275,6 +279,8 @@ void wf_invalidate_region(wfContext* wfc, UINT32 x, UINT32 y, UINT32 width, UINT
 
 void wf_update_offset(wfContext* wfc)
 {
+	WLog_VRB("wf_gdi", "wf_update_offset");
+	
 	rdpSettings* settings;
 	settings = wfc->common.context.settings;
 
@@ -318,6 +324,8 @@ void wf_update_offset(wfContext* wfc)
 
 void wf_resize_window(wfContext* wfc)
 {
+	WLog_VRB("wf_gdi", "wf_resize_window");
+	
 	rdpSettings* settings;
 	settings = wfc->common.context.settings;
 
@@ -810,6 +818,8 @@ void wf_gdi_register_update_callbacks(rdpUpdate* update)
 
 void wf_update_canvas_diff(wfContext* wfc)
 {
+	WLog_VRB("wf_gdi", "wf_update_canvas_diff");
+	
 	RECT rc_client, rc_wnd;
 	int dx, dy;
 	GetClientRect(wfc->hwnd, &rc_client);

@@ -667,6 +667,8 @@ static UINT encomsp_send_change_participant_control_level_pdu(
 static UINT encomsp_recv_graphics_stream_paused_pdu(encomspPlugin* encomsp, wStream* s,
                                                     const ENCOMSP_ORDER_HEADER* header)
 {
+	WLog_DBG("encomsp_main", "encomsp_recv_graphics_stream_paused_pdu()");
+
 	size_t beg, end, pos;
 	EncomspClientContext* context;
 	ENCOMSP_GRAPHICS_STREAM_PAUSED_PDU pdu;
@@ -713,6 +715,8 @@ static UINT encomsp_recv_graphics_stream_paused_pdu(encomspPlugin* encomsp, wStr
 static UINT encomsp_recv_graphics_stream_resumed_pdu(encomspPlugin* encomsp, wStream* s,
                                                      const ENCOMSP_ORDER_HEADER* header)
 {
+	WLog_DBG("encomsp_main", "encomsp_recv_graphics_stream_resumed_pdu()");
+	
 	size_t beg, end, pos;
 	EncomspClientContext* context;
 	ENCOMSP_GRAPHICS_STREAM_RESUMED_PDU pdu;
@@ -760,7 +764,7 @@ static UINT encomsp_process_receive(encomspPlugin* encomsp, wStream* s)
 {
 	UINT error = CHANNEL_RC_OK;
 	ENCOMSP_ORDER_HEADER header;
-
+	
 	while (Stream_GetRemainingLength(s) > 0)
 	{
 		if ((error = encomsp_read_header(s, &header)))
@@ -769,8 +773,8 @@ static UINT encomsp_process_receive(encomspPlugin* encomsp, wStream* s)
 			return error;
 		}
 
-		// WLog_DBG(TAG, "EncomspReceive: Type: %"PRIu16" Length: %"PRIu16"", header.Type,
-		// header.Length);
+		WLog_DBG(TAG, "EncomspReceive: Type: %"PRIu16" Length: %"PRIu16"", header.Type,
+		header.Length);
 
 		switch (header.Type)
 		{
@@ -870,7 +874,12 @@ static UINT encomsp_process_receive(encomspPlugin* encomsp, wStream* s)
 				}
 
 				break;
-
+				
+			case ODTYPE_PARTICIPANT_CTRL_CHANGE_RESPONSE:
+				WLog_DBG("encomsp_main", "ODTYPE_PARTICIPANT_CTRL_CHANGE_RESPONSE");
+				
+				break;
+				
 			case ODTYPE_GRAPHICS_STREAM_PAUSED:
 				if ((error = encomsp_recv_graphics_stream_paused_pdu(encomsp, s, &header)))
 				{

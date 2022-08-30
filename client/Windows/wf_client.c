@@ -105,6 +105,8 @@ static BOOL wf_end_paint(rdpContext* context)
 		invalidRect.top = cinvalid[i].y;
 		invalidRect.right = cinvalid[i].x + cinvalid[i].w;
 		invalidRect.bottom = cinvalid[i].y + cinvalid[i].h;
+		// invalidRegion needs to be scaled if using smart sizing???
+		WLog_VRB("wf_client", "wf_end_paint() invalidRegion %d,%d,%d,%d", invalidRect.left, invalidRect.top, invalidRect.right, invalidRect.bottom);
 		region16_union_rect(&invalidRegion, &invalidRegion, &invalidRect);
 	}
 
@@ -116,17 +118,25 @@ static BOOL wf_end_paint(rdpContext* context)
 		updateRect.right = extents->right;
 		updateRect.bottom = extents->bottom;
 
-		if (wfc->xScrollVisible)
-		{
-			updateRect.left -= MIN(updateRect.left, wfc->xCurrentScroll);
-			updateRect.right -= MIN(updateRect.right, wfc->xCurrentScroll);
-		}
-		if (wfc->yScrollVisible)
-		{
-			updateRect.top -= MIN(updateRect.top, wfc->yCurrentScroll);
-			updateRect.bottom -= MIN(updateRect.bottom, wfc->yCurrentScroll);
-		}
-
+		// if (wfc->xScrollVisible)
+		// {
+			// updateRect.left -= MIN(updateRect.left, wfc->xCurrentScroll);
+			// updateRect.right -= MIN(updateRect.right, wfc->xCurrentScroll);
+		// }
+		// if (wfc->yScrollVisible)
+		// {
+			// updateRect.top -= MIN(updateRect.top, wfc->yCurrentScroll);
+			// updateRect.bottom -= MIN(updateRect.bottom, wfc->yCurrentScroll);
+		// }
+		
+		wf_scale_rect(wfc, &updateRect);
+		
+		WLog_VRB("wf_client", "wf_end_paint() %d,%d,%d,%d", updateRect.left, updateRect.top, updateRect.right, updateRect.bottom);
+		
+		// just do entire window?
+		// RECT windowRect;
+		// GetClientRect(wfc->hwnd, &windowRect);
+		// InvalidateRect(wfc->hwnd, &windowRect, TRUE);
 		InvalidateRect(wfc->hwnd, &updateRect, FALSE);
 
 		if (wfc->rail)
@@ -173,6 +183,8 @@ static BOOL wf_begin_paint(rdpContext* context)
 
 static BOOL wf_desktop_resize(rdpContext* context)
 {
+	WLog_VRB("wf_client", "wf_desktop_resize");
+
 	BOOL same;
 	RECT rect;
 	rdpSettings* settings;
@@ -285,6 +297,7 @@ static void wf_add_system_menu(wfContext* wfc)
 {
 	HMENU hMenu;
 	MENUITEMINFO item_info;
+	MENUITEMINFO item_info_request_control;
 
 	if (wfc->fullscreen && !wfc->fullscreen_toggle)
 	{
@@ -297,6 +310,20 @@ static void wf_add_system_menu(wfContext* wfc)
 	}
 
 	hMenu = GetSystemMenu(wfc->hwnd, FALSE);
+	
+	if (wfc->common.context.settings->RemoteAssistanceMode)
+	{
+		ZeroMemory(&item_info_request_control, sizeof(MENUITEMINFO));
+		item_info_request_control.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
+		item_info_request_control.cbSize = sizeof(MENUITEMINFO);
+		item_info_request_control.wID = SYSCOMMAND_ID_REQUEST_CONTROL;
+		item_info_request_control.fType = MFT_STRING;
+		item_info_request_control.dwTypeData = _wcsdup(_T("Request control"));
+		item_info_request_control.cch = (UINT)_wcslen(_T("Request control"));
+		// item_info_request_control.dwItemData = (ULONG_PTR)wfc;
+		InsertMenuItem(hMenu, 6, TRUE, &item_info_request_control);
+	}
+	
 	ZeroMemory(&item_info, sizeof(MENUITEMINFO));
 	item_info.fMask = MIIM_CHECKMARKS | MIIM_FTYPE | MIIM_ID | MIIM_STRING | MIIM_DATA;
 	item_info.cbSize = sizeof(MENUITEMINFO);
@@ -311,6 +338,7 @@ static void wf_add_system_menu(wfContext* wfc)
 	{
 		CheckMenuItem(hMenu, SYSCOMMAND_ID_SMARTSIZING, MF_CHECKED);
 	}
+
 }
 
 static WCHAR* wf_window_get_title(rdpSettings* settings)
@@ -1118,6 +1146,7 @@ static DWORD WINAPI wf_keyboard_thread(LPVOID lpParam)
 	wfc = (wfContext*)lpParam;
 	WINPR_ASSERT(NULL != wfc);
 	hook_handle = SetWindowsHookEx(WH_KEYBOARD_LL, wf_ll_kbd_proc, wfc->hInstance, 0);
+	// hook_handle = NULL;
 
 	if (hook_handle)
 	{
@@ -1162,6 +1191,8 @@ int freerdp_client_set_window_size(wfContext* wfc, int width, int height)
 
 void wf_size_scrollbars(wfContext* wfc, UINT32 client_width, UINT32 client_height)
 {
+	WLog_VRB("wf_client", "wf_size_scrollbars");
+
 	const rdpSettings* settings;
 	WINPR_ASSERT(wfc);
 
