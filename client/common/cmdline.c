@@ -2511,7 +2511,7 @@ int freerdp_client_settings_parse_command_line_arguments(rdpSettings* settings, 
 			if (!arg->Value)
 				return COMMAND_LINE_ERROR_MISSING_ARGUMENT;
 
-			if (!parseSizeValue(arg->Value, &x, &y) || x > UINT16_MAX || y > UINT16_MAX)
+			if (!parseSizeValue(arg->Value, &x, &y) || x > ULONG_MAX || y > ULONG_MAX)
 			{
 				WLog_ERR(TAG, "invalid window-position argument");
 				return COMMAND_LINE_ERROR_MISSING_ARGUMENT;
@@ -2519,6 +2519,8 @@ int freerdp_client_settings_parse_command_line_arguments(rdpSettings* settings, 
 
 			settings->DesktopPosX = (UINT32)x;
 			settings->DesktopPosY = (UINT32)y;
+			
+			WLog_DBG(TAG, "window-position %d %d", settings->DesktopPosX, settings->DesktopPosY);
 		}
 		CommandLineSwitchCase(arg, "menu-anims")
 		{
