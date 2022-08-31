@@ -57,6 +57,8 @@ static BOOL g_flipping_out;
 static BOOL alt_pressed = FALSE;
 static BOOL ctrl_pressed = FALSE;
 static DWORD last_key_up = 0;
+static DWORD last_key_up_time = 0;
+static DWORD last_key_dn = 0;
 
 static BOOL alt_ctrl_down()
 {
@@ -105,10 +107,11 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 	{
 		switch (wParam)
 		{
-			case WM_KEYDOWN:
-			case WM_SYSKEYDOWN:
 			case WM_KEYUP:
 			case WM_SYSKEYUP:
+			case WM_KEYDOWN:
+			case WM_SYSKEYDOWN:
+
 				if (!wfc)
 					wfc = (wfContext*)GetWindowLongPtr(g_focus_hWnd, GWLP_USERDATA);
 				p = (PKBDLLHOOKSTRUCT)lParam;
@@ -129,10 +132,11 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 						alt_pressed = (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN);
 						DEBUG_KBD("alt_pressed=%d", alt_pressed);
 						
-						if ((wParam == WM_SYSKEYUP || wParam == WM_KEYUP) && (last_key_up == VK_LCONTROL || last_key_up == VK_RCONTROL) && !ctrl_pressed)
+						if ((wParam == WM_SYSKEYUP || wParam == WM_KEYUP) && (last_key_up == VK_LCONTROL || last_key_up == VK_RCONTROL)
+							&& !ctrl_pressed && !last_key_dn)
 						{
 							last_key_up = 0;
-							DEBUG_KBD("DEFOCUS");
+							if (p->time - last_key_up_time <= 250) DEBUG_KBD("DEFOCUS %d", SetForegroundWindow(FindWindow(L"Shell_TrayWnd", NULL)));
 						}
 						
 						// last_key_up = ctrl_pressed ? p->vkCode : 0;
@@ -143,18 +147,40 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 						ctrl_pressed = (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN);
 						DEBUG_KBD("ctrl_pressed=%d", ctrl_pressed);
 						
-						DEBUG_KBD("last_key_up=%d", last_key_up);
-						if ((wParam == WM_SYSKEYUP || wParam == WM_KEYUP) && (last_key_up == VK_LMENU || last_key_up == VK_RMENU) && !alt_pressed)
+						if ((wParam == WM_SYSKEYUP || wParam == WM_KEYUP) && (last_key_up == VK_LMENU || last_key_up == VK_LMENU)
+							&& !alt_pressed && !last_key_dn)
 						{
 							last_key_up = 0;
-							DEBUG_KBD("DEFOCUS");
+							if (p->time - last_key_up_time <= 250) DEBUG_KBD("DEFOCUS %d", SetForegroundWindow(FindWindow(L"Shell_TrayWnd", NULL)));
 						}
 						
 						// last_key_up = alt_pressed ? p->vkCode : 0;
 					break;
 				}
 				
-				if (wParam == WM_KEYUP || wParam == WM_SYSKEYUP) last_key_up = p->vkCode;
+				
+				if (wParam == WM_KEYUP || wParam == WM_SYSKEYUP)
+				{
+					last_key_up = p->vkCode;
+					last_key_up_time = p->time;
+					DEBUG_KBD("set last_key_up=0x%08lX time:%d", last_key_up, last_key_up_time);
+					
+					if ((!alt_pressed) && (!ctrl_pressed) && (last_key_up == p->vkCode))
+					{
+						last_key_dn = 0;
+						DEBUG_KBD("set last_key_dn=0x%08lX", last_key_dn);
+					}
+				}
+				else if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
+				{
+					// any key other than CTRL or ALT
+					if (!(p->vkCode == VK_LCONTROL || p->vkCode == VK_RCONTROL || p->vkCode == VK_LMENU || p->vkCode == VK_LMENU))
+					{
+						last_key_dn = p->vkCode;
+						DEBUG_KBD("set last_key_dn=0x%08lX", last_key_dn);
+					}
+
+				}
 
 				if (wfc->fullscreen_toggle &&
 				    ((p->vkCode == VK_RETURN) || (p->vkCode == VK_CANCEL)) &&
@@ -211,7 +237,7 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 				else
 					return 1;
 
-				break;
+			break;
 		}
 	}
 
