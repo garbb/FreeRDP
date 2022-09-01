@@ -3495,6 +3495,8 @@ static BOOL read_primary_order(wLog* log, const char* orderName, wStream* s,
 
 static BOOL update_recv_primary_order(rdpUpdate* update, wStream* s, BYTE flags)
 {
+	WLog_VRB(TAG, "update_recv_primary_order()");
+
 	BYTE field;
 	BOOL rc = FALSE;
 	rdp_update_internal* up = update_cast(update);
@@ -3565,7 +3567,7 @@ static BOOL update_recv_primary_order(rdpUpdate* update, wStream* s, BYTE flags)
 	rc = IFCALLRESULT(TRUE, primary->common.OrderInfo, context, orderInfo, orderName);
 	if (!rc)
 		return FALSE;
-
+		
 	switch (orderInfo->orderType)
 	{
 		case ORDER_TYPE_DSTBLT:
@@ -3767,6 +3769,7 @@ static BOOL update_recv_primary_order(rdpUpdate* update, wStream* s, BYTE flags)
 	if (flags & ORDER_BOUNDS)
 	{
 		rc = IFCALLRESULT(defaultReturn, update->SetBounds, context, NULL);
+		WLog_VRB(TAG, "update_recv_primary_order() update->SetBounds rs=%d", rc);
 	}
 
 	return rc;
@@ -3774,6 +3777,8 @@ static BOOL update_recv_primary_order(rdpUpdate* update, wStream* s, BYTE flags)
 
 static BOOL update_recv_secondary_order(rdpUpdate* update, wStream* s, BYTE flags)
 {
+	WLog_VRB(TAG, "update_recv_secondary_order()");
+
 	BOOL rc = FALSE;
 	size_t start, end, pos, diff;
 	BYTE orderType;
@@ -4036,6 +4041,8 @@ static BOOL read_altsec_order(wStream* s, BYTE orderType, rdpAltSecUpdate* altse
 
 static BOOL update_recv_altsec_order(rdpUpdate* update, wStream* s, BYTE flags)
 {
+	WLog_VRB(TAG, "update_recv_altsec_order()");
+
 	BYTE orderType = flags >> 2; /* orderType is in higher 6 bits of flags field */
 	BOOL rc = FALSE;
 	rdp_update_internal* up = update_cast(update);
@@ -4137,6 +4144,8 @@ static BOOL update_recv_altsec_order(rdpUpdate* update, wStream* s, BYTE flags)
 }
 BOOL update_recv_order(rdpUpdate* update, wStream* s)
 {
+	WLog_DBG(TAG, "update_recv_order()");
+	
 	BOOL rc;
 	BYTE controlFlags;
 	rdp_update_internal* up = update_cast(update);

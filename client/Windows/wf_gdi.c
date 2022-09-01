@@ -479,7 +479,12 @@ static BOOL wf_gdi_set_bounds(rdpContext* context, const rdpBounds* bounds)
 	wfContext* wfc = (wfContext*)context;
 
 	if (!context || !bounds)
+	{
+		WLog_VRB(TAG, "wf_gdi_set_bounds FALSE");
+		if (!context) WLog_VRB(TAG, "wf_gdi_set_bounds invalid context");
+		if (!bounds) WLog_VRB(TAG, "wf_gdi_set_bounds invalid bounds");
 		return FALSE;
+	}
 
 	if (bounds != NULL)
 	{
@@ -490,6 +495,7 @@ static BOOL wf_gdi_set_bounds(rdpContext* context, const rdpBounds* bounds)
 	else
 		SelectClipRgn(wfc->drawing->hdc, NULL);
 
+	WLog_VRB(TAG, "wf_gdi_set_bounds TRUE");
 	return TRUE;
 }
 
@@ -568,6 +574,8 @@ static BOOL wf_gdi_scrblt(rdpContext* context, const SCRBLT_ORDER* scrblt)
 
 static BOOL wf_gdi_opaque_rect(rdpContext* context, const OPAQUE_RECT_ORDER* opaque_rect)
 {
+	WLog_DBG(TAG, "wf_gdi_opaque_rect()");
+	
 	RECT rect;
 	HBRUSH brush;
 	COLORREF brush_color;
@@ -591,6 +599,8 @@ static BOOL wf_gdi_opaque_rect(rdpContext* context, const OPAQUE_RECT_ORDER* opa
 		wf_invalidate_region(wfc, rect.left, rect.top, rect.right - rect.left + 1,
 		                     rect.bottom - rect.top + 1);
 
+	WLog_DBG(TAG, "wf_gdi_opaque_rect() TRUE");
+							 
 	return TRUE;
 }
 

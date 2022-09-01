@@ -80,7 +80,7 @@ static BOOL wf_has_console(void)
 }
 
 static BOOL wf_end_paint(rdpContext* context)
-{
+{	
 	int i;
 	rdpGdi* gdi;
 	int ninvalid;
@@ -166,6 +166,8 @@ static BOOL wf_end_paint(rdpContext* context)
 
 static BOOL wf_begin_paint(rdpContext* context)
 {
+	WLog_DBG(TAG, "wf_begin_paint");
+
 	HGDI_DC hdc;
 
 	if (!context || !context->gdi || !context->gdi->primary || !context->gdi->primary->hdc)

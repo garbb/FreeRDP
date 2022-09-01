@@ -136,7 +136,7 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 							&& !ctrl_pressed && !last_key_dn)
 						{
 							last_key_up = 0;
-							if (p->time - last_key_up_time <= 250) DEBUG_KBD("DEFOCUS %d", SetForegroundWindow(FindWindow(L"Shell_TrayWnd", NULL)));
+							if (p->time - last_key_up_time <= 250) {DEBUG_KBD("DEFOCUS"); SetForegroundWindow(FindWindow(L"Shell_TrayWnd", NULL));}
 						}
 						
 						// last_key_up = ctrl_pressed ? p->vkCode : 0;
@@ -151,7 +151,7 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 							&& !alt_pressed && !last_key_dn)
 						{
 							last_key_up = 0;
-							if (p->time - last_key_up_time <= 250) DEBUG_KBD("DEFOCUS %d", SetForegroundWindow(FindWindow(L"Shell_TrayWnd", NULL)));
+							if (p->time - last_key_up_time <= 250) {DEBUG_KBD("DEFOCUS"); SetForegroundWindow(FindWindow(L"Shell_TrayWnd", NULL));}
 						}
 						
 						// last_key_up = alt_pressed ? p->vkCode : 0;
@@ -530,7 +530,6 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 			case WM_PAINT:
 				WLog_VRB("wf_event", "WM_PAINT");
-				// DEBUG_KBD("GetAsyncKeyState(VK_CONTROL)=%d, GetAsyncKeyState(VK_MENU)=%d", GetAsyncKeyState(VK_CONTROL), GetAsyncKeyState(VK_MENU));
 								
 				hdc = BeginPaint(hWnd, &ps);
 				x = ps.rcPaint.left;
