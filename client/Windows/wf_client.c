@@ -449,7 +449,7 @@ static BOOL wf_post_connect(freerdp* instance)
 #ifdef WITH_PROGRESS_BAR
 	if (wfc->taskBarList)
 	{
-		ShowWindow(wfc->hwnd, SW_SHOWMINIMIZED);
+		ShowWindow(wfc->hwnd, SW_SHOW);
 		wfc->taskBarList->lpVtbl->SetProgressState(wfc->taskBarList, wfc->hwnd, TBPF_INDETERMINATE);
 	}
 #endif
@@ -471,6 +471,7 @@ static BOOL wf_post_connect(freerdp* instance)
 	}
 
 	wfc->floatbar = wf_floatbar_new(wfc, wfc->hInstance, settings->Floatbar);
+		
 	return TRUE;
 }
 
