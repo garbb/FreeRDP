@@ -60,6 +60,8 @@ static DWORD last_key_up = 0;
 static DWORD last_key_up_time = 0;
 static DWORD last_key_dn = 0;
 
+static LPARAM last_mousemove_lParam;
+
 static BOOL alt_ctrl_down()
 {
 	BOOL ret = (ctrl_pressed && alt_pressed);
@@ -588,8 +590,13 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 				break;
 
 			case WM_MOUSEMOVE:
-				wf_scale_mouse_event(wfc, PTR_FLAGS_MOVE, X_POS(lParam) - wfc->offset_x,
-				                     Y_POS(lParam) - wfc->offset_y);
+				// ignore repeated mousemove events if mouse has not moved
+				if (last_mousemove_lParam != lParam)
+				{
+					wf_scale_mouse_event(wfc, PTR_FLAGS_MOVE, X_POS(lParam) - wfc->offset_x,
+										 Y_POS(lParam) - wfc->offset_y);
+					last_mousemove_lParam = lParam;
+				}
 				break;
 #if (_WIN32_WINNT >= 0x0400) || (_WIN32_WINDOWS > 0x0400)
 
