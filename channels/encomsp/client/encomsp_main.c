@@ -52,6 +52,8 @@ struct encomsp_plugin
  */
 static UINT encomsp_read_header(wStream* s, ENCOMSP_ORDER_HEADER* header)
 {
+	WLog_DBG(TAG, "encomsp_read_header");
+
 	if (!Stream_CheckAndLogRequiredLength(TAG, s, ENCOMSP_ORDER_HEADER_SIZE))
 		return ERROR_INVALID_DATA;
 
@@ -67,6 +69,8 @@ static UINT encomsp_read_header(wStream* s, ENCOMSP_ORDER_HEADER* header)
  */
 static UINT encomsp_write_header(wStream* s, const ENCOMSP_ORDER_HEADER* header)
 {
+	WLog_DBG(TAG, "encomsp_write_header");
+
 	Stream_Write_UINT16(s, header->Type);   /* Type (2 bytes) */
 	Stream_Write_UINT16(s, header->Length); /* Length (2 bytes) */
 	return CHANNEL_RC_OK;
@@ -79,6 +83,8 @@ static UINT encomsp_write_header(wStream* s, const ENCOMSP_ORDER_HEADER* header)
  */
 static UINT encomsp_read_unicode_string(wStream* s, ENCOMSP_UNICODE_STRING* str)
 {
+	WLog_DBG(TAG, "encomsp_read_unicode_string");
+
 	ZeroMemory(str, sizeof(ENCOMSP_UNICODE_STRING));
 
 	if (!Stream_CheckAndLogRequiredLength(TAG, s, 2))
@@ -101,6 +107,8 @@ static UINT encomsp_read_unicode_string(wStream* s, ENCOMSP_UNICODE_STRING* str)
 
 static EncomspClientContext* encomsp_get_client_interface(encomspPlugin* encomsp)
 {
+	WLog_DBG(TAG, "encomsp_get_client_interface");
+
 	EncomspClientContext* pInterface;
 	pInterface = (EncomspClientContext*)encomsp->channelEntryPoints.pInterface;
 	return pInterface;
@@ -113,6 +121,8 @@ static EncomspClientContext* encomsp_get_client_interface(encomspPlugin* encomsp
  */
 static UINT encomsp_virtual_channel_write(encomspPlugin* encomsp, wStream* s)
 {
+	WLog_DBG(TAG, "encomsp_virtual_channel_write");
+
 	UINT status;
 
 	if (!encomsp)
@@ -145,6 +155,8 @@ static UINT encomsp_virtual_channel_write(encomspPlugin* encomsp, wStream* s)
 static UINT encomsp_recv_filter_updated_pdu(encomspPlugin* encomsp, wStream* s,
                                             const ENCOMSP_ORDER_HEADER* header)
 {
+	WLog_DBG(TAG, "encomsp_recv_filter_updated_pdu");
+
 	size_t beg, end, pos;
 	EncomspClientContext* context;
 	ENCOMSP_FILTER_UPDATED_PDU pdu;
@@ -196,6 +208,8 @@ static UINT encomsp_recv_filter_updated_pdu(encomspPlugin* encomsp, wStream* s,
 static UINT encomsp_recv_application_created_pdu(encomspPlugin* encomsp, wStream* s,
                                                  const ENCOMSP_ORDER_HEADER* header)
 {
+	WLog_DBG(TAG, "encomsp_recv_application_created_pdu");
+
 	size_t beg, end, pos;
 	EncomspClientContext* context;
 	ENCOMSP_APPLICATION_CREATED_PDU pdu;
@@ -255,6 +269,8 @@ static UINT encomsp_recv_application_created_pdu(encomspPlugin* encomsp, wStream
 static UINT encomsp_recv_application_removed_pdu(encomspPlugin* encomsp, wStream* s,
                                                  const ENCOMSP_ORDER_HEADER* header)
 {
+	WLog_DBG(TAG, "encomsp_recv_application_removed_pdu");
+
 	size_t beg, end, pos;
 	EncomspClientContext* context;
 	ENCOMSP_APPLICATION_REMOVED_PDU pdu;
@@ -306,6 +322,8 @@ static UINT encomsp_recv_application_removed_pdu(encomspPlugin* encomsp, wStream
 static UINT encomsp_recv_window_created_pdu(encomspPlugin* encomsp, wStream* s,
                                             const ENCOMSP_ORDER_HEADER* header)
 {
+	WLog_DBG(TAG, "encomsp_recv_window_created_pdu");
+
 	size_t beg, end, pos;
 	EncomspClientContext* context;
 	ENCOMSP_WINDOW_CREATED_PDU pdu;
@@ -366,6 +384,8 @@ static UINT encomsp_recv_window_created_pdu(encomspPlugin* encomsp, wStream* s,
 static UINT encomsp_recv_window_removed_pdu(encomspPlugin* encomsp, wStream* s,
                                             const ENCOMSP_ORDER_HEADER* header)
 {
+	WLog_DBG(TAG, "encomsp_recv_window_removed_pdu");
+
 	size_t beg, end, pos;
 	EncomspClientContext* context;
 	ENCOMSP_WINDOW_REMOVED_PDU pdu;
@@ -417,6 +437,8 @@ static UINT encomsp_recv_window_removed_pdu(encomspPlugin* encomsp, wStream* s,
 static UINT encomsp_recv_show_window_pdu(encomspPlugin* encomsp, wStream* s,
                                          const ENCOMSP_ORDER_HEADER* header)
 {
+	WLog_DBG(TAG, "encomsp_recv_show_window_pdu");
+
 	size_t beg, end, pos;
 	EncomspClientContext* context;
 	ENCOMSP_SHOW_WINDOW_PDU pdu;
@@ -468,6 +490,8 @@ static UINT encomsp_recv_show_window_pdu(encomspPlugin* encomsp, wStream* s,
 static UINT encomsp_recv_participant_created_pdu(encomspPlugin* encomsp, wStream* s,
                                                  const ENCOMSP_ORDER_HEADER* header)
 {
+	// WLog_DBG(TAG, "encomsp_recv_participant_created_pdu");
+
 	size_t beg, end, pos;
 	EncomspClientContext* context;
 	ENCOMSP_PARTICIPANT_CREATED_PDU pdu;
@@ -517,6 +541,8 @@ static UINT encomsp_recv_participant_created_pdu(encomspPlugin* encomsp, wStream
 	if (error)
 		WLog_ERR(TAG, "context->ParticipantCreated failed with error %" PRIu32 "", error);
 
+	// WLog_DBG(TAG, "encomsp_recv_participant_created_pdu() ParticipantId=%d, GroupId=%d, Flags=%d", pdu.ParticipantId, pdu.GroupId, pdu.Flags);
+		
 	return error;
 }
 
@@ -528,6 +554,8 @@ static UINT encomsp_recv_participant_created_pdu(encomspPlugin* encomsp, wStream
 static UINT encomsp_recv_participant_removed_pdu(encomspPlugin* encomsp, wStream* s,
                                                  const ENCOMSP_ORDER_HEADER* header)
 {
+	WLog_DBG(TAG, "encomsp_recv_participant_removed_pdu");
+
 	size_t beg, end;
 	EncomspClientContext* context;
 	ENCOMSP_PARTICIPANT_REMOVED_PDU pdu;
@@ -578,6 +606,8 @@ static UINT encomsp_recv_participant_removed_pdu(encomspPlugin* encomsp, wStream
 static UINT encomsp_recv_change_participant_control_level_pdu(encomspPlugin* encomsp, wStream* s,
                                                               const ENCOMSP_ORDER_HEADER* header)
 {
+	WLog_DBG(TAG, "encomsp_recv_change_participant_control_level_pdu");
+
 	size_t beg, end, pos;
 	EncomspClientContext* context;
 	ENCOMSP_CHANGE_PARTICIPANT_CONTROL_LEVEL_PDU pdu;
@@ -631,6 +661,8 @@ static UINT encomsp_recv_change_participant_control_level_pdu(encomspPlugin* enc
 static UINT encomsp_send_change_participant_control_level_pdu(
     EncomspClientContext* context, const ENCOMSP_CHANGE_PARTICIPANT_CONTROL_LEVEL_PDU* pdu)
 {
+	WLog_DBG(TAG, "encomsp_send_change_participant_control_level_pdu");
+
 	wStream* s;
 	encomspPlugin* encomsp;
 	UINT error;
@@ -762,6 +794,8 @@ static UINT encomsp_recv_graphics_stream_resumed_pdu(encomspPlugin* encomsp, wSt
  */
 static UINT encomsp_process_receive(encomspPlugin* encomsp, wStream* s)
 {
+	WLog_DBG(TAG, "encomsp_process_receive");
+
 	UINT error = CHANNEL_RC_OK;
 	ENCOMSP_ORDER_HEADER header;
 	
@@ -915,6 +949,7 @@ static UINT encomsp_process_receive(encomspPlugin* encomsp, wStream* s)
 
 static void encomsp_process_connect(encomspPlugin* encomsp)
 {
+	WLog_DBG(TAG, "encomsp_process_connect");
 }
 
 /**
@@ -926,6 +961,8 @@ static UINT encomsp_virtual_channel_event_data_received(encomspPlugin* encomsp, 
                                                         UINT32 dataLength, UINT32 totalLength,
                                                         UINT32 dataFlags)
 {
+	WLog_DBG(TAG, "encomsp_virtual_channel_event_data_received");
+
 	wStream* data_in;
 
 	if ((dataFlags & CHANNEL_FLAG_SUSPEND) || (dataFlags & CHANNEL_FLAG_RESUME))
@@ -982,6 +1019,8 @@ static VOID VCAPITYPE encomsp_virtual_channel_open_event_ex(LPVOID lpUserParam, 
                                                             UINT32 dataLength, UINT32 totalLength,
                                                             UINT32 dataFlags)
 {
+	WLog_DBG(TAG, "encomsp_virtual_channel_open_event_ex");
+
 	UINT error = CHANNEL_RC_OK;
 	encomspPlugin* encomsp = (encomspPlugin*)lpUserParam;
 
@@ -1023,12 +1062,14 @@ static VOID VCAPITYPE encomsp_virtual_channel_open_event_ex(LPVOID lpUserParam, 
 
 static DWORD WINAPI encomsp_virtual_channel_client_thread(LPVOID arg)
 {
+	WLog_DBG(TAG, "encomsp_virtual_channel_client_thread");
+
 	wStream* data;
 	wMessage message;
 	encomspPlugin* encomsp = (encomspPlugin*)arg;
 	UINT error = CHANNEL_RC_OK;
 	encomsp_process_connect(encomsp);
-
+	
 	while (1)
 	{
 		if (!MessageQueue_Wait(encomsp->queue))
@@ -1047,6 +1088,8 @@ static DWORD WINAPI encomsp_virtual_channel_client_thread(LPVOID arg)
 
 		if (message.id == WMQ_QUIT)
 			break;
+
+		WLog_DBG(TAG, "encomsp_virtual_channel_client_thread message.id=%d", message.id);
 
 		if (message.id == 0)
 		{
@@ -1079,6 +1122,8 @@ static DWORD WINAPI encomsp_virtual_channel_client_thread(LPVOID arg)
 static UINT encomsp_virtual_channel_event_connected(encomspPlugin* encomsp, LPVOID pData,
                                                     UINT32 dataLength)
 {
+	WLog_DBG(TAG, "encomsp_virtual_channel_event_connected");
+
 	WINPR_ASSERT(encomsp);
 
 	encomsp->queue = MessageQueue_New(NULL);
@@ -1109,6 +1154,8 @@ static UINT encomsp_virtual_channel_event_connected(encomspPlugin* encomsp, LPVO
  */
 static UINT encomsp_virtual_channel_event_disconnected(encomspPlugin* encomsp)
 {
+	WLog_DBG(TAG, "encomsp_virtual_channel_event_disconnected");
+
 	UINT rc;
 
 	if (encomsp->OpenHandle == 0)
@@ -1159,6 +1206,8 @@ static UINT encomsp_virtual_channel_event_disconnected(encomspPlugin* encomsp)
  */
 static UINT encomsp_virtual_channel_event_terminated(encomspPlugin* encomsp)
 {
+	WLog_DBG(TAG, "encomsp_virtual_channel_event_terminated");
+
 	encomsp->InitHandle = 0;
 	free(encomsp->context);
 	free(encomsp);
@@ -1169,6 +1218,8 @@ static VOID VCAPITYPE encomsp_virtual_channel_init_event_ex(LPVOID lpUserParam, 
                                                             UINT event, LPVOID pData,
                                                             UINT dataLength)
 {
+	WLog_DBG(TAG, "encomsp_virtual_channel_init_event_ex");
+
 	UINT error = CHANNEL_RC_OK;
 	encomspPlugin* encomsp = (encomspPlugin*)lpUserParam;
 
@@ -1217,6 +1268,8 @@ static VOID VCAPITYPE encomsp_virtual_channel_init_event_ex(LPVOID lpUserParam, 
 
 BOOL VCAPITYPE VirtualChannelEntryEx(PCHANNEL_ENTRY_POINTS_EX pEntryPoints, PVOID pInitHandle)
 {
+	WLog_DBG(TAG, "VirtualChannelEntryEx");
+
 	UINT rc;
 	encomspPlugin* encomsp;
 	EncomspClientContext* context = NULL;

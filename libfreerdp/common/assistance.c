@@ -182,38 +182,38 @@ static BOOL append_address(rdpAssistanceFile* file, const char* host, const char
 
 static BOOL freerdp_assistance_parse_address_list(rdpAssistanceFile* file, char* list)
 {
-   WLog_DBG(TAG, "freerdp_assistance_parse_address_list list=%s", list);
-	
-   BOOL rc = FALSE;
-   
-   if (!file || !list)
-      return FALSE;
-	
-   char* strp = list;
-   char* s = ";";
-   char* token;
-   
-   // convert pointer type string into array type string
-   // maybe not needed for freerdp compile because *p = '\0' for pointer-type string seems to run fine??
-      // yes, tested and not needed if strp is char*
-   // const int bufflen = strlen(strp)+1;
-   // char str[bufflen];
-   // strncpy(str, strp, sizeof(str)-1); str[bufflen-1] = '\0';
-   
-   // get the first token
-   token = strtok(strp, s);
-   
-   // walk through other tokens
-   while( token != NULL ) {
-      char* port = strchr(token, ':');
-      *port = '\0';
-      port++;
-   	
-      if (!append_address(file, token, port))
-        goto out;
-    
-      token = strtok(NULL, s);
-   }
+	WLog_DBG(TAG, "freerdp_assistance_parse_address_list list=%s", list);
+
+	BOOL rc = FALSE;
+
+	if (!file || !list)
+		return FALSE;
+
+	char* strp = list;
+	char* s = ";";
+	char* token;
+
+	// convert pointer type string into array type string
+	// maybe not needed for freerdp compile because *p = '\0' for pointer-type string seems to run fine??
+		// yes, tested and not needed if strp is char*
+	// const int bufflen = strlen(strp)+1;
+	// char str[bufflen];
+	// strncpy(str, strp, sizeof(str)-1); str[bufflen-1] = '\0';
+
+	// get the first token
+	token = strtok(strp, s);
+
+	// walk through other tokens
+	while( token != NULL ) {
+		char* port = strchr(token, ':');
+		*port = '\0';
+		port++;
+
+		if (!append_address(file, token, port))
+		  goto out;
+
+		token = strtok(NULL, s);
+	}
 	rc = TRUE;
 out:
 	return rc;	

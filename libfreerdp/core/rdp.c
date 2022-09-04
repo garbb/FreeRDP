@@ -552,6 +552,8 @@ BOOL rdp_read_header(rdpRdp* rdp, wStream* s, UINT16* length, UINT16* channelId)
 
 	if (!per_read_length(s, length)) /* userData (OCTET_STRING) */
 		return FALSE;
+	
+	WLog_DBG(TAG, "rdp_read_header code=%x li=%x choice=%d domainMCSPDU=%d byte=%x length=%d initiator=%d", code, li, choice, domainMCSPDU, byte, length, initiator);
 
 	if (!Stream_CheckAndLogRequiredLength(TAG, s, *length))
 		return FALSE;
@@ -886,6 +888,8 @@ static BOOL rdp_recv_server_set_keyboard_ime_status_pdu(rdpRdp* rdp, wStream* s)
 
 static BOOL rdp_recv_set_error_info_data_pdu(rdpRdp* rdp, wStream* s)
 {
+	WLog_DBG(TAG, "rdp_recv_set_error_info_data_pdu");
+
 	UINT32 errorInfo;
 
 	if (!Stream_CheckAndLogRequiredLength(TAG, s, 4))
@@ -909,6 +913,8 @@ static BOOL rdp_recv_server_auto_reconnect_status_pdu(rdpRdp* rdp, wStream* s)
 
 static BOOL rdp_recv_server_status_info_pdu(rdpRdp* rdp, wStream* s)
 {
+	WLog_DBG(TAG, "rdp_recv_server_status_info_pdu");
+
 	UINT32 statusCode;
 
 	if (!Stream_CheckAndLogRequiredLength(TAG, s, 4))
@@ -959,6 +965,8 @@ static BOOL rdp_recv_monitor_layout_pdu(rdpRdp* rdp, wStream* s)
 
 int rdp_recv_data_pdu(rdpRdp* rdp, wStream* s)
 {
+	WLog_DBG(TAG, "rdp_recv_data_pdu");
+
 	BYTE type;
 	wStream* cs;
 	UINT16 length;
@@ -1173,6 +1181,8 @@ out_fail:
 
 int rdp_recv_message_channel_pdu(rdpRdp* rdp, wStream* s, UINT16 securityFlags)
 {
+	WLog_DBG(TAG, "rdp_recv_message_channel_pdu");
+
 	WINPR_ASSERT(rdp);
 	WINPR_ASSERT(s);
 
@@ -1205,6 +1215,8 @@ int rdp_recv_message_channel_pdu(rdpRdp* rdp, wStream* s, UINT16 securityFlags)
 
 int rdp_recv_out_of_sequence_pdu(rdpRdp* rdp, wStream* s)
 {
+	WLog_DBG(TAG, "rdp_recv_out_of_sequence_pdu");
+
 	UINT16 type;
 	UINT16 length;
 	UINT16 channelId;
@@ -1393,6 +1405,8 @@ const char* pdu_type_to_str(UINT16 pduType)
 
 static int rdp_recv_tpkt_pdu(rdpRdp* rdp, wStream* s)
 {
+	WLog_DBG(TAG, "rdp_recv_tpkt_pdu");
+
 	int rc = 0;
 	UINT16 length;
 	UINT16 pduType;
@@ -1410,6 +1424,8 @@ static int rdp_recv_tpkt_pdu(rdpRdp* rdp, wStream* s)
 
 	if (!rdp_read_header(rdp, s, &length, &channelId))
 		return -1;
+
+	WLog_DBG(TAG, "rdp_recv_tpkt_pdu channelId=%d", channelId);
 
 	if (freerdp_shall_disconnect_context(rdp->context))
 		return 0;
@@ -1471,6 +1487,8 @@ static int rdp_recv_tpkt_pdu(rdpRdp* rdp, wStream* s)
 
 			rdp->settings->PduSource = pduSource;
 			rdp->inPackets++;
+
+			WLog_DBG(TAG, "rdp_recv_tpkt_pdu pduType=%d", pduType);
 
 			switch (pduType)
 			{
@@ -1579,6 +1597,8 @@ static int rdp_recv_fastpath_pdu(rdpRdp* rdp, wStream* s)
 
 static int rdp_recv_pdu(rdpRdp* rdp, wStream* s)
 {
+	WLog_DBG(TAG, "rdp_recv_pdu");
+
 	if (tpkt_verify_header(s))
 		return rdp_recv_tpkt_pdu(rdp, s);
 	else
@@ -1587,6 +1607,8 @@ static int rdp_recv_pdu(rdpRdp* rdp, wStream* s)
 
 int rdp_recv_callback(rdpTransport* transport, wStream* s, void* extra)
 {
+	WLog_DBG(TAG, "rdp_recv_callback");
+
 	int status = 0;
 	rdpRdp* rdp = (rdpRdp*)extra;
 

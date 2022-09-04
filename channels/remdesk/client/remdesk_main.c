@@ -30,6 +30,10 @@
 #include <freerdp/channels/log.h>
 #include <freerdp/client/remdesk.h>
 
+#ifdef _WIN32
+#include "../../../client/Windows/wf_client.h"
+#endif
+
 #include "remdesk_main.h"
 
 /**
@@ -325,6 +329,8 @@ static UINT remdesk_send_ctl_version_info_pdu(remdeskPlugin* remdesk)
 static UINT remdesk_recv_ctl_result_pdu(remdeskPlugin* remdesk, wStream* s,
                                         REMDESK_CHANNEL_HEADER* header, UINT32* pResult)
 {
+	WLog_DBG(TAG, "remdesk_recv_ctl_result_pdu");
+
 	UINT32 result;
 
 	WINPR_ASSERT(remdesk);
@@ -333,11 +339,34 @@ static UINT remdesk_recv_ctl_result_pdu(remdeskPlugin* remdesk, wStream* s,
 	WINPR_ASSERT(pResult);
 
 	if (!Stream_CheckAndLogRequiredLength(TAG, s, 4))
-		return ERROR_INVALID_DATA;
+		return ERROR_INVALID_DATA;	//  0x0000000D
 
 	Stream_Read_UINT32(s, result); /* result (4 bytes) */
 	*pResult = result;
-	// WLog_DBG(TAG, "RemdeskRecvResult: 0x%08"PRIX32"", result);
+	WLog_DBG(TAG, "RemdeskRecvResult: 0x%08"PRIX32"", result);
+
+	switch (result)
+	{
+		case REMDESK_ERROR_HELPEESAIDNO:
+			WLog_DBG(TAG, "remote assistance connection request was denied");
+
+			wfContext* wfc = (wfContext*)remdesk->rdpcontext;
+			WLog_DBG(TAG, "wfc->hwnd=%x", wfc->hwnd);
+
+#ifdef _WIN32
+			MessageBox(wfc->hwnd, L"Remote assistance connection request was denied", L"Remote Assistance", MB_ICONERROR | MB_SETFOREGROUND);
+#endif
+			return ERROR_CONNECTION_REFUSED;
+			break;
+
+		case REMDESK_ERROR_HELPEESAIDYES:
+			WLog_DBG(TAG, "remote assistance request was accepted");
+			break;
+
+		default:
+			break;
+	}
+
 	return CHANNEL_RC_OK;
 }
 
@@ -570,6 +599,8 @@ static UINT remdesk_send_ctl_expert_on_vista_pdu(remdeskPlugin* remdesk)
  */
 static UINT remdesk_recv_ctl_pdu(remdeskPlugin* remdesk, wStream* s, REMDESK_CHANNEL_HEADER* header)
 {
+	WLog_DBG(TAG, "remdesk_recv_ctl_pdu");
+
 	UINT error = CHANNEL_RC_OK;
 	UINT32 msgType = 0;
 	UINT32 result = 0;
@@ -583,7 +614,7 @@ static UINT remdesk_recv_ctl_pdu(remdeskPlugin* remdesk, wStream* s, REMDESK_CHA
 
 	Stream_Read_UINT32(s, msgType); /* msgType (4 bytes) */
 
-	// WLog_DBG(TAG, "msgType: %"PRIu32"", msgType);
+	WLog_DBG(TAG, "msgType: %"PRIu32"", msgType);
 
 	switch (msgType)
 	{
@@ -697,15 +728,17 @@ static UINT remdesk_recv_ctl_pdu(remdeskPlugin* remdesk, wStream* s, REMDESK_CHA
  */
 static UINT remdesk_process_receive(remdeskPlugin* remdesk, wStream* s)
 {
+	WLog_DBG(TAG, "remdesk_process_receive");
+
 	UINT status;
 	REMDESK_CHANNEL_HEADER header;
 
 	WINPR_ASSERT(remdesk);
 	WINPR_ASSERT(s);
 
-#if 0
+#if 1
 	WLog_DBG(TAG, "RemdeskReceive: %"PRIuz"", Stream_GetRemainingLength(s));
-	winpr_HexDump(Stream_Pointer(s), Stream_GetRemainingLength(s));
+	winpr_HexDump(TAG, WLOG_DEBUG, Stream_Buffer(s), Stream_Length(s));
 #endif
 
 	if ((status = remdesk_read_channel_header(s, &header)))
@@ -754,6 +787,8 @@ static UINT remdesk_virtual_channel_event_data_received(remdeskPlugin* remdesk, 
                                                         UINT32 dataLength, UINT32 totalLength,
                                                         UINT32 dataFlags)
 {
+	WLog_DBG(TAG, "remdesk_virtual_channel_event_data_received");
+
 	wStream* data_in;
 
 	WINPR_ASSERT(remdesk);
@@ -814,6 +849,8 @@ static VOID VCAPITYPE remdesk_virtual_channel_open_event_ex(LPVOID lpUserParam, 
                                                             UINT32 dataLength, UINT32 totalLength,
                                                             UINT32 dataFlags)
 {
+	// WLog_DBG(TAG, "remdesk_virtual_channel_open_event_ex event=%d", event);
+
 	UINT error = CHANNEL_RC_OK;
 	remdeskPlugin* remdesk = (remdeskPlugin*)lpUserParam;
 
@@ -885,6 +922,8 @@ static DWORD WINAPI remdesk_virtual_channel_client_thread(LPVOID arg)
 			error = ERROR_INTERNAL_ERROR;
 			break;
 		}
+
+		WLog_DBG(TAG, "remdesk_virtual_channel_client_thread message.id=%d", message.id);
 
 		if (message.id == WMQ_QUIT)
 			break;
