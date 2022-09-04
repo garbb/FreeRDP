@@ -349,11 +349,10 @@ static UINT remdesk_recv_ctl_result_pdu(remdeskPlugin* remdesk, wStream* s,
 	{
 		case REMDESK_ERROR_HELPEESAIDNO:
 			WLog_DBG(TAG, "remote assistance connection request was denied");
-
+			
+#ifdef _WIN32
 			wfContext* wfc = (wfContext*)remdesk->rdpcontext;
 			WLog_DBG(TAG, "wfc->hwnd=%x", wfc->hwnd);
-
-#ifdef _WIN32
 			MessageBox(wfc->hwnd, L"Remote assistance connection request was denied", L"Remote Assistance", MB_ICONERROR | MB_SETFOREGROUND);
 #endif
 			return ERROR_CONNECTION_REFUSED;
