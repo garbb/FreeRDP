@@ -351,15 +351,14 @@ static UINT remdesk_recv_ctl_result_pdu(remdeskPlugin* remdesk, wStream* s,
 			WLog_DBG(TAG, "remote assistance connection request was denied");
 			
 #ifdef _WIN32
-			wfContext* wfc = (wfContext*)remdesk->rdpcontext;
-			WLog_DBG(TAG, "wfc->hwnd=%x", wfc->hwnd);
-			MessageBox(wfc->hwnd, L"Remote assistance connection request was denied", L"Remote Assistance", MB_ICONERROR | MB_SETFOREGROUND);
+			MessageBox(((wfContext*)remdesk->rdpcontext)->hwnd, L"Remote assistance connection request was denied", L"Remote Assistance", MB_ICONERROR | MB_SETFOREGROUND);
 #endif
 			return ERROR_CONNECTION_REFUSED;
 			break;
 
+		// oh this does not actually happen on accept...huh
 		case REMDESK_ERROR_HELPEESAIDYES:
-			WLog_DBG(TAG, "remote assistance request was accepted");
+			WLog_DBG(TAG, "remote assistance connection request was accepted");
 			break;
 
 		default:
@@ -735,7 +734,7 @@ static UINT remdesk_process_receive(remdeskPlugin* remdesk, wStream* s)
 	WINPR_ASSERT(remdesk);
 	WINPR_ASSERT(s);
 
-#if 1
+#if 0
 	WLog_DBG(TAG, "RemdeskReceive: %"PRIuz"", Stream_GetRemainingLength(s));
 	winpr_HexDump(TAG, WLOG_DEBUG, Stream_Buffer(s), Stream_Length(s));
 #endif

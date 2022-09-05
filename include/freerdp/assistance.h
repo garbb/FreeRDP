@@ -55,6 +55,7 @@ extern "C"
 	                                                            const char** pwd, size_t* size);
 
 	FREERDP_API rdpAssistanceFile* freerdp_assistance_file_new(void);
+	FREERDP_API rdpAssistanceFile* freerdp_assistance_file_new_ex(char* hostaddress);
 	FREERDP_API void freerdp_assistance_file_free(rdpAssistanceFile* file);
 
 	FREERDP_API void freerdp_assistance_print_file(rdpAssistanceFile* file, wLog* log, DWORD level);

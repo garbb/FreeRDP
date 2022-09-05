@@ -344,6 +344,8 @@ int freerdp_client_settings_parse_assistance_file(rdpSettings* settings, int arg
 	char* filename;
 	char* password = NULL;
 	rdpAssistanceFile* file;
+	
+	char* hostaddress = NULL;
 
 	if (!settings || !argv || (argc < 2))
 		return -1;
@@ -357,8 +359,19 @@ int freerdp_client_settings_parse_assistance_file(rdpSettings* settings, int arg
 		if (key)
 			password = strchr(key, ':') + 1;
 	}
+	
+	for (x = 2; x < argc; x++)
+	{
+		const char* key = strstr(argv[x], "v:");
 
-	file = freerdp_assistance_file_new();
+		if (key)
+			hostaddress = strchr(key, ':') + 1;
+	}
+
+	// file = freerdp_assistance_file_new();
+	// WLog_DBG(TAG, "settings->ServerHostname=%s", settings->ServerHostname);
+	// WLog_DBG(TAG, "settings->DesktopPosX=%x", settings->DesktopPosX);
+	file = freerdp_assistance_file_new_ex(hostaddress);
 
 	if (!file)
 		return -1;

@@ -68,6 +68,8 @@ struct rdp_assistance_file
 
 	char* filename;
 	char* password;
+	
+	char* hostaddress;
 };
 
 /**
@@ -164,7 +166,15 @@ static BOOL reallocate(rdpAssistanceFile* file, const char* host, UINT32 port)
 
 static BOOL append_address(rdpAssistanceFile* file, const char* host, const char* port)
 {
+	// if there is an address specified at cmd line /v: param then only try to connect to this one
+	if (file->hostaddress && strcmp(host, file->hostaddress))
+	{
+		WLog_DBG(TAG, "SKIP append_address:%s:%s", host, port);
+		return TRUE;
+	}
+
 	WLog_DBG(TAG, "append_address:%s:%s", host, port);
+	// WLog_DBG(TAG, "append_address:settings->SmartSizing=%d", file->settings->SmartSizing);
 
 	unsigned long p;
 	errno = 0;
@@ -176,7 +186,7 @@ static BOOL append_address(rdpAssistanceFile* file, const char* host, const char
 		         port);
 		return FALSE;
 	}
-
+	
 	return reallocate(file, host, (UINT16)p);
 }
 
@@ -469,7 +479,7 @@ static BOOL freerdp_assistance_parse_connection_string2(rdpAssistanceFile* file)
 		q++;
 		length = strlen(p);
 		
-		WLog_DBG(TAG, "HOST: %s:%s length:%d", p, port, length);
+		// WLog_DBG(TAG, "HOST: %s:%s length:%d", p, port, length);
 
 		if (length > 7)
 		{
@@ -1285,6 +1295,15 @@ rdpAssistanceFile* freerdp_assistance_file_new(void)
 {
 	winpr_InitializeSSL(WINPR_SSL_INIT_DEFAULT);
 	return (rdpAssistanceFile*)calloc(1, sizeof(rdpAssistanceFile));
+}
+
+rdpAssistanceFile* freerdp_assistance_file_new_ex(char* hostaddress)
+{
+	rdpAssistanceFile* file;
+	file = freerdp_assistance_file_new();
+	file->hostaddress = hostaddress;
+	
+	return file;
 }
 
 void freerdp_assistance_file_free(rdpAssistanceFile* file)
