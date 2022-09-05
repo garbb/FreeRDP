@@ -1611,6 +1611,8 @@ struct rdp_settings
 	 * The zone below this point is ABI unstable, and
 	 * is therefore potentially subject to ABI breakage.
 	 */
+	 
+	ALIGN64 UINT32 MaximizeWindow;
 
 	/*
 	 * Extensions

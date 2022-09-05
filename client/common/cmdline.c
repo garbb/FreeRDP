@@ -1933,6 +1933,10 @@ int freerdp_client_settings_parse_command_line_arguments(rdpSettings* settings, 
 		{
 			settings->Workarea = enable;
 		}
+		CommandLineSwitchCase(arg, "maximizewindow")
+		{
+			settings->MaximizeWindow = TRUE;
+		}
 		CommandLineSwitchCase(arg, "monitors")
 		{
 			if (arg->Flags & COMMAND_LINE_VALUE_PRESENT)

@@ -157,7 +157,7 @@ static BOOL wf_end_paint(rdpContext* context)
 		}
 #endif
 
-		ShowWindow(wfc->hwnd, SW_SHOWNORMAL);
+		ShowWindow(wfc->hwnd, context->settings->MaximizeWindow ? SW_MAXIMIZE : SW_SHOWNORMAL);
 		WLog_INFO(TAG, "Window is shown!");
 		fflush(stdout);
 	}
@@ -166,7 +166,7 @@ static BOOL wf_end_paint(rdpContext* context)
 
 static BOOL wf_begin_paint(rdpContext* context)
 {
-	WLog_DBG(TAG, "wf_begin_paint");
+	WLog_VRB(TAG, "wf_begin_paint");
 
 	HGDI_DC hdc;
 
@@ -449,7 +449,7 @@ static BOOL wf_post_connect(freerdp* instance)
 #ifdef WITH_PROGRESS_BAR
 	if (wfc->taskBarList)
 	{
-		ShowWindow(wfc->hwnd, SW_SHOW);
+		ShowWindow(wfc->hwnd, settings->MaximizeWindow ? SW_MAXIMIZE : SW_SHOW);
 		wfc->taskBarList->lpVtbl->SetProgressState(wfc->taskBarList, wfc->hwnd, TBPF_INDETERMINATE);
 	}
 #endif
