@@ -4144,7 +4144,7 @@ static BOOL update_recv_altsec_order(rdpUpdate* update, wStream* s, BYTE flags)
 }
 BOOL update_recv_order(rdpUpdate* update, wStream* s)
 {
-	WLog_DBG(TAG, "update_recv_order()");
+	WLog_VRB(TAG, "update_recv_order()");
 	
 	BOOL rc;
 	BYTE controlFlags;

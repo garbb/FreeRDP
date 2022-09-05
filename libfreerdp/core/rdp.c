@@ -1597,7 +1597,7 @@ static int rdp_recv_fastpath_pdu(rdpRdp* rdp, wStream* s)
 
 static int rdp_recv_pdu(rdpRdp* rdp, wStream* s)
 {
-	WLog_DBG(TAG, "rdp_recv_pdu");
+	WLog_VRB(TAG, "rdp_recv_pdu");
 
 	if (tpkt_verify_header(s))
 		return rdp_recv_tpkt_pdu(rdp, s);
@@ -1607,7 +1607,7 @@ static int rdp_recv_pdu(rdpRdp* rdp, wStream* s)
 
 int rdp_recv_callback(rdpTransport* transport, wStream* s, void* extra)
 {
-	WLog_DBG(TAG, "rdp_recv_callback");
+	WLog_VRB(TAG, "rdp_recv_callback");
 
 	int status = 0;
 	rdpRdp* rdp = (rdpRdp*)extra;

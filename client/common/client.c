@@ -369,8 +369,6 @@ int freerdp_client_settings_parse_assistance_file(rdpSettings* settings, int arg
 	}
 
 	// file = freerdp_assistance_file_new();
-	// WLog_DBG(TAG, "settings->ServerHostname=%s", settings->ServerHostname);
-	// WLog_DBG(TAG, "settings->DesktopPosX=%x", settings->DesktopPosX);
 	file = freerdp_assistance_file_new_ex(hostaddress);
 
 	if (!file)

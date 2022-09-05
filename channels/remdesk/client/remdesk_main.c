@@ -734,7 +734,7 @@ static UINT remdesk_process_receive(remdeskPlugin* remdesk, wStream* s)
 	WINPR_ASSERT(remdesk);
 	WINPR_ASSERT(s);
 
-#if 0
+#if 1
 	WLog_DBG(TAG, "RemdeskReceive: %"PRIuz"", Stream_GetRemainingLength(s));
 	winpr_HexDump(TAG, WLOG_DEBUG, Stream_Buffer(s), Stream_Length(s));
 #endif

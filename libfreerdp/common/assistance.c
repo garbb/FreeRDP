@@ -167,6 +167,7 @@ static BOOL reallocate(rdpAssistanceFile* file, const char* host, UINT32 port)
 static BOOL append_address(rdpAssistanceFile* file, const char* host, const char* port)
 {
 	// if there is an address specified at cmd line /v: param then only try to connect to this one
+	// otherwise client will try to connect to all addresses in order and take a long time to fail for each address that is not connectable
 	if (file->hostaddress && strcmp(host, file->hostaddress))
 	{
 		WLog_DBG(TAG, "SKIP append_address:%s:%s", host, port);

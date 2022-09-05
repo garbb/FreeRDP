@@ -341,7 +341,7 @@ INLINE BOOL gdi_CRgnToRect(INT64 x, INT64 y, INT32 w, INT32 h, HGDI_RECT rect)
 
 	if (invalid)
 	{
-		WLog_DBG(TAG, "Invisible rectangle %" PRId64 "x%" PRId64 "-%" PRId64 "x%" PRId64, x, y, r,
+		WLog_VRB(TAG, "Invisible rectangle %" PRId64 "x%" PRId64 "-%" PRId64 "x%" PRId64, x, y, r,
 		         b);
 		return FALSE;
 	}

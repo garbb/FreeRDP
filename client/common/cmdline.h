@@ -406,6 +406,7 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	{ "wm-class", COMMAND_LINE_VALUE_REQUIRED, "<class-name>", NULL, NULL, -1, NULL,
 	  "Set the WM_CLASS hint for the window instance" },
 	{ "workarea", COMMAND_LINE_VALUE_FLAG, NULL, NULL, NULL, -1, NULL, "Use available work area" },
+	{ "maximizewindow", COMMAND_LINE_VALUE_FLAG, NULL, NULL, NULL, -1, NULL, "maximize window" },
 	{ NULL, 0, NULL, NULL, NULL, -1, NULL, NULL }
 };
 #endif /* CLIENT_COMMON_CMDLINE_H */

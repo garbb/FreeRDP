@@ -102,6 +102,8 @@ static UINT encomsp_read_unicode_string(wStream* s, ENCOMSP_UNICODE_STRING* str)
 		return ERROR_INVALID_DATA;
 
 	Stream_Read(s, &(str->wString), (str->cchString * 2)); /* String (variable) */
+	// WLog_DBG(TAG, "encomsp_read_unicode_string %s", str->wString);
+	
 	return CHANNEL_RC_OK;
 }
 
@@ -490,7 +492,7 @@ static UINT encomsp_recv_show_window_pdu(encomspPlugin* encomsp, wStream* s,
 static UINT encomsp_recv_participant_created_pdu(encomspPlugin* encomsp, wStream* s,
                                                  const ENCOMSP_ORDER_HEADER* header)
 {
-	// WLog_DBG(TAG, "encomsp_recv_participant_created_pdu");
+	WLog_DBG(TAG, "encomsp_recv_participant_created_pdu");
 
 	size_t beg, end, pos;
 	EncomspClientContext* context;
@@ -513,6 +515,8 @@ static UINT encomsp_recv_participant_created_pdu(encomspPlugin* encomsp, wStream
 	Stream_Read_UINT32(s, pdu.ParticipantId); /* ParticipantId (4 bytes) */
 	Stream_Read_UINT32(s, pdu.GroupId);       /* GroupId (4 bytes) */
 	Stream_Read_UINT16(s, pdu.Flags);         /* Flags (2 bytes) */
+	
+	WLog_DBG(TAG, "encomsp_recv_participant_created_pdu() ParticipantId=%d, GroupId=%d, Flags=%d", pdu.ParticipantId, pdu.GroupId, pdu.Flags);
 
 	if ((error = encomsp_read_unicode_string(s, &(pdu.FriendlyName))))
 	{
@@ -540,8 +544,6 @@ static UINT encomsp_recv_participant_created_pdu(encomspPlugin* encomsp, wStream
 
 	if (error)
 		WLog_ERR(TAG, "context->ParticipantCreated failed with error %" PRIu32 "", error);
-
-	// WLog_DBG(TAG, "encomsp_recv_participant_created_pdu() ParticipantId=%d, GroupId=%d, Flags=%d", pdu.ParticipantId, pdu.GroupId, pdu.Flags);
 		
 	return error;
 }

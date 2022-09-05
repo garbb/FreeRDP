@@ -84,9 +84,10 @@ static UINT
 wf_encomsp_participant_created(EncomspClientContext* context,
                                const ENCOMSP_PARTICIPANT_CREATED_PDU* participantCreated)
 {
+	WLog_DBG(TAG, "wf_encomsp_participant_created");
+
 	wfContext* wf;
 	rdpSettings* settings;
-	BOOL request;
 	static BOOL requestedOnce = FALSE;
 
 	if (!context || !context->custom || !participantCreated)
@@ -100,14 +101,21 @@ wf_encomsp_participant_created(EncomspClientContext* context,
 	if (!settings)
 		return ERROR_INVALID_PARAMETER;
 
-	request = freerdp_settings_get_bool(settings, FreeRDP_RemoteAssistanceRequestControl);
-	if (!requestedOnce && request && (participantCreated->Flags & ENCOMSP_MAY_VIEW) &&
+	if ((participantCreated->Flags & ENCOMSP_MAY_VIEW) &&
 	    !(participantCreated->Flags & ENCOMSP_MAY_INTERACT))
 	{
-		// if (!encomsp_toggle_control(context, TRUE))
-		requestedOnce = TRUE;
-		if (!encomsp_toggle_control(context))
-			return ERROR_INTERNAL_ERROR;
+		// if auto-request-control setting is enabled then only request control once upon connect,
+		// otherwise it will request control again every time server turns off control which is a bit annoying
+		if (!requestedOnce && freerdp_settings_get_bool(settings, FreeRDP_RemoteAssistanceRequestControl))
+		{
+			requestedOnce = TRUE;
+			if (!encomsp_toggle_control(context))
+				return ERROR_INTERNAL_ERROR;
+		}
+	}
+	else if (participantCreated->Flags & ENCOMSP_MAY_INTERACT)
+	{
+		WLog_DBG(TAG, "wf_encomsp_participant_created ENCOMSP_MAY_INTERACT");
 	}
 
 	return CHANNEL_RC_OK;
