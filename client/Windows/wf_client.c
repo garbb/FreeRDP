@@ -185,7 +185,7 @@ static BOOL wf_begin_paint(rdpContext* context)
 
 static BOOL wf_desktop_resize(rdpContext* context)
 {
-	WLog_VRB("wf_client", "wf_desktop_resize");
+	WLog_DBG("wf_client", "wf_desktop_resize");
 
 	BOOL same;
 	RECT rect;
@@ -214,7 +214,7 @@ static BOOL wf_desktop_resize(rdpContext* context)
 
 	if (wfc->fullscreen != TRUE)
 	{
-		if (wfc->hwnd)
+		if (wfc->hwnd && !settings->SmartSizing)
 			SetWindowPos(wfc->hwnd, HWND_TOP, -1, -1, settings->DesktopWidth + wfc->diff.x,
 			             settings->DesktopHeight + wfc->diff.y, SWP_NOMOVE);
 	}
