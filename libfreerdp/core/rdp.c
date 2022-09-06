@@ -552,8 +552,11 @@ BOOL rdp_read_header(rdpRdp* rdp, wStream* s, UINT16* length, UINT16* channelId)
 
 	if (!per_read_length(s, length)) /* userData (OCTET_STRING) */
 		return FALSE;
-	
-	WLog_DBG(TAG, "rdp_read_header code=%x li=%x choice=%d domainMCSPDU=%d byte=%x length=%d initiator=%d", code, li, choice, domainMCSPDU, byte, length, initiator);
+
+	WLog_DBG(
+	    TAG,
+	    "rdp_read_header code=%x li=%x choice=%d domainMCSPDU=%d byte=%x length=%d initiator=%d",
+	    code, li, choice, domainMCSPDU, byte, length, initiator);
 
 	if (!Stream_CheckAndLogRequiredLength(TAG, s, *length))
 		return FALSE;

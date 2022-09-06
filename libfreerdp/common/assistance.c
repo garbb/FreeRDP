@@ -68,7 +68,7 @@ struct rdp_assistance_file
 
 	char* filename;
 	char* password;
-	
+
 	char* hostaddress;
 };
 
@@ -167,7 +167,8 @@ static BOOL reallocate(rdpAssistanceFile* file, const char* host, UINT32 port)
 static BOOL append_address(rdpAssistanceFile* file, const char* host, const char* port)
 {
 	// if there is an address specified at cmd line /v: param then only try to connect to this one
-	// otherwise client will try to connect to all addresses in order and take a long time to fail for each address that is not connectable
+	// otherwise client will try to connect to all addresses in order and take a long time to fail
+	// for each address that is not connectable
 	if (file->hostaddress && strcmp(host, file->hostaddress))
 	{
 		WLog_DBG(TAG, "SKIP append_address:%s:%s", host, port);
@@ -187,7 +188,7 @@ static BOOL append_address(rdpAssistanceFile* file, const char* host, const char
 		         port);
 		return FALSE;
 	}
-	
+
 	return reallocate(file, host, (UINT16)p);
 }
 
@@ -205,8 +206,8 @@ static BOOL freerdp_assistance_parse_address_list(rdpAssistanceFile* file, char*
 	char* token;
 
 	// convert pointer type string into array type string
-	// maybe not needed for freerdp compile because *p = '\0' for pointer-type string seems to run fine??
-		// yes, tested and not needed if strp is char*
+	// maybe not needed for freerdp compile because *p = '\0' for pointer-type string seems to run
+	// fine?? yes, tested and not needed if strp is char*
 	// const int bufflen = strlen(strp)+1;
 	// char str[bufflen];
 	// strncpy(str, strp, sizeof(str)-1); str[bufflen-1] = '\0';
@@ -215,19 +216,20 @@ static BOOL freerdp_assistance_parse_address_list(rdpAssistanceFile* file, char*
 	token = strtok(strp, s);
 
 	// walk through other tokens
-	while( token != NULL ) {
+	while (token != NULL)
+	{
 		char* port = strchr(token, ':');
 		*port = '\0';
 		port++;
 
 		if (!append_address(file, token, port))
-		  goto out;
+			goto out;
 
 		token = strtok(NULL, s);
 	}
 	rc = TRUE;
 out:
-	return rc;	
+	return rc;
 }
 
 static BOOL freerdp_assistance_parse_connection_string1(rdpAssistanceFile* file)
@@ -330,13 +332,13 @@ static BOOL freerdp_assistance_parse_connection_string2(rdpAssistanceFile* file)
 	char* end;
 	char* p;
 	BOOL rc = FALSE;
-	
+
 	if (!file || !file->ConnectionString2)
 		return FALSE;
 
 	str = file->ConnectionString2;
 	WLog_DBG(TAG, "freerdp_assistance_parse_connection_string2: %s", str);
-	
+
 	if (!strstr(str, "<E>"))
 	{
 		WLog_ERR(TAG, "Failed to parse ASSISTANCE file: ConnectionString2 missing field <E>");
@@ -479,15 +481,16 @@ static BOOL freerdp_assistance_parse_connection_string2(rdpAssistanceFile* file)
 		q[0] = '\0';
 		q++;
 		length = strlen(p);
-		
+
 		// WLog_DBG(TAG, "HOST: %s:%s length:%d", p, port, length);
 
 		if (length > 7)
 		{
-			if (!append_address(file, p, port)) {
+			if (!append_address(file, p, port))
+			{
 				WLog_DBG(TAG, "append_address return out_fail");
 				goto out_fail;
-				}
+			}
 		}
 
 		p = strstr(q, "<L P=\"");
@@ -1082,9 +1085,10 @@ int freerdp_assistance_parse_file_buffer(rdpAssistanceFile* file, const char* bu
 
 			case 1:
 			{
-				if (!freerdp_assistance_parse_connection_string1(file)) {
+				if (!freerdp_assistance_parse_connection_string1(file))
+				{
 					status = -1;
-					}
+				}
 			}
 			break;
 
@@ -1227,8 +1231,12 @@ BOOL freerdp_assistance_populate_settings_from_assistance_file(rdpAssistanceFile
 		return FALSE;
 
 	if (!file->RASessionId || !file->MachineAddresses)
-		// return FALSE;
-		{WLog_DBG(TAG, "freerdp_assistance_populate_settings_from_assistance_file error2, %s", file->RASessionId);return FALSE;}
+	// return FALSE;
+	{
+		WLog_DBG(TAG, "freerdp_assistance_populate_settings_from_assistance_file error2, %s",
+		         file->RASessionId);
+		return FALSE;
+	}
 
 	if (!freerdp_settings_set_string(settings, FreeRDP_RemoteAssistanceSessionId,
 	                                 file->RASessionId))
@@ -1303,7 +1311,7 @@ rdpAssistanceFile* freerdp_assistance_file_new_ex(char* hostaddress)
 	rdpAssistanceFile* file;
 	file = freerdp_assistance_file_new();
 	file->hostaddress = hostaddress;
-	
+
 	return file;
 }
 

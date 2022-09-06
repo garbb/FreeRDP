@@ -3567,7 +3567,7 @@ static BOOL update_recv_primary_order(rdpUpdate* update, wStream* s, BYTE flags)
 	rc = IFCALLRESULT(TRUE, primary->common.OrderInfo, context, orderInfo, orderName);
 	if (!rc)
 		return FALSE;
-		
+
 	switch (orderInfo->orderType)
 	{
 		case ORDER_TYPE_DSTBLT:
@@ -4145,7 +4145,7 @@ static BOOL update_recv_altsec_order(rdpUpdate* update, wStream* s, BYTE flags)
 BOOL update_recv_order(rdpUpdate* update, wStream* s)
 {
 	WLog_VRB(TAG, "update_recv_order()");
-	
+
 	BOOL rc;
 	BYTE controlFlags;
 	rdp_update_internal* up = update_cast(update);

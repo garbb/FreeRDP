@@ -141,7 +141,7 @@ BOOL freerdp_channel_process(freerdp* instance, wStream* s, UINT16 channelId, si
 		WLog_ERR(TAG, "Expected %" PRIu32 " bytes, but have %" PRIdz, length, chunkLength);
 		return FALSE;
 	}
-	
+
 	WLog_DBG(TAG, "freerdp_channel_process length=%d, flags=%x", length, flags);
 
 	IFCALLRET(instance->ReceiveChannelData, rc, instance, channelId, Stream_Pointer(s), chunkLength,
