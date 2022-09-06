@@ -614,7 +614,7 @@ static UINT remdesk_recv_ctl_pdu(remdeskPlugin* remdesk, wStream* s, REMDESK_CHA
 
 	Stream_Read_UINT32(s, msgType); /* msgType (4 bytes) */
 
-	WLog_DBG(TAG, "msgType: %" PRIu32 "", msgType);
+	WLog_DBG(TAG, "msgType: %"PRIu32"", msgType);
 
 	switch (msgType)
 	{
@@ -737,7 +737,7 @@ static UINT remdesk_process_receive(remdeskPlugin* remdesk, wStream* s)
 	WINPR_ASSERT(s);
 
 #if 1
-	WLog_DBG(TAG, "RemdeskReceive: %" PRIuz "", Stream_GetRemainingLength(s));
+	WLog_DBG(TAG, "RemdeskReceive: %"PRIuz"", Stream_GetRemainingLength(s));
 	winpr_HexDump(TAG, WLOG_DEBUG, Stream_Buffer(s), Stream_Length(s));
 #endif
 

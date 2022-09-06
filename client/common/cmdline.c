@@ -2523,7 +2523,7 @@ int freerdp_client_settings_parse_command_line_arguments(rdpSettings* settings, 
 
 			settings->DesktopPosX = (UINT32)x;
 			settings->DesktopPosY = (UINT32)y;
-			
+
 			WLog_DBG(TAG, "window-position %d %d", settings->DesktopPosX, settings->DesktopPosY);
 		}
 		CommandLineSwitchCase(arg, "menu-anims")
