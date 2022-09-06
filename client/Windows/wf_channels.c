@@ -31,39 +31,22 @@
 #include <freerdp/log.h>
 #define TAG CLIENT_TAG("windows")
 
-// BOOL encomsp_toggle_control(EncomspClientContext* encomsp, BOOL control)
-// {
-	// ENCOMSP_CHANGE_PARTICIPANT_CONTROL_LEVEL_PDU pdu;
-
-	// if (!encomsp)
-		// return FALSE;
-
-	// pdu.ParticipantId = 0;
-	// pdu.Flags = ENCOMSP_REQUEST_VIEW;
-
-	// if (control)
-		// pdu.Flags |= ENCOMSP_REQUEST_INTERACT;
-
-	// encomsp->ChangeParticipantControlLevel(encomsp, &pdu);
-	// return TRUE;
-// }
-
 BOOL encomsp_request_control(wfContext* wf, BOOL request)
 {
 	ENCOMSP_CHANGE_PARTICIPANT_CONTROL_LEVEL_PDU pdu;
-	
+
 	EncomspClientContext* encomsp = wf->encomsp;
 
 	if (!encomsp)
 		return FALSE;
-		
+
 	// wfContext* wf = (wfContext*)encomsp->custom;
 	if (!wf->common.context.settings->RemoteAssistanceMode)
 		return FALSE;
 
 	pdu.ParticipantId = 0;
 	pdu.Flags = ENCOMSP_REQUEST_VIEW;
-	
+
 	if (request)
 		pdu.Flags |= ENCOMSP_REQUEST_INTERACT;
 
@@ -105,8 +88,10 @@ wf_encomsp_participant_created(EncomspClientContext* context,
 	    !(participantCreated->Flags & ENCOMSP_MAY_INTERACT))
 	{
 		// if auto-request-control setting is enabled then only request control once upon connect,
-		// otherwise it will request control again every time server turns off control which is a bit annoying
-		if (!requestedOnce && freerdp_settings_get_bool(settings, FreeRDP_RemoteAssistanceRequestControl))
+		// otherwise it will request control again every time server turns off control which is a
+		// bit annoying
+		if (!requestedOnce &&
+		    freerdp_settings_get_bool(settings, FreeRDP_RemoteAssistanceRequestControl))
 		{
 			requestedOnce = TRUE;
 			if (!encomsp_toggle_control(context))

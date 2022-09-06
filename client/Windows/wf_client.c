@@ -80,7 +80,7 @@ static BOOL wf_has_console(void)
 }
 
 static BOOL wf_end_paint(rdpContext* context)
-{	
+{
 	int i;
 	rdpGdi* gdi;
 	int ninvalid;
@@ -106,7 +106,8 @@ static BOOL wf_end_paint(rdpContext* context)
 		invalidRect.right = cinvalid[i].x + cinvalid[i].w;
 		invalidRect.bottom = cinvalid[i].y + cinvalid[i].h;
 		// invalidRegion needs to be scaled if using smart sizing???
-		WLog_VRB("wf_client", "wf_end_paint() invalidRegion %d,%d,%d,%d", invalidRect.left, invalidRect.top, invalidRect.right, invalidRect.bottom);
+		WLog_VRB("wf_client", "wf_end_paint() invalidRegion %d,%d,%d,%d", invalidRect.left,
+		         invalidRect.top, invalidRect.right, invalidRect.bottom);
 		region16_union_rect(&invalidRegion, &invalidRegion, &invalidRect);
 	}
 
@@ -120,19 +121,20 @@ static BOOL wf_end_paint(rdpContext* context)
 
 		// if (wfc->xScrollVisible)
 		// {
-			// updateRect.left -= MIN(updateRect.left, wfc->xCurrentScroll);
-			// updateRect.right -= MIN(updateRect.right, wfc->xCurrentScroll);
+		// updateRect.left -= MIN(updateRect.left, wfc->xCurrentScroll);
+		// updateRect.right -= MIN(updateRect.right, wfc->xCurrentScroll);
 		// }
 		// if (wfc->yScrollVisible)
 		// {
-			// updateRect.top -= MIN(updateRect.top, wfc->yCurrentScroll);
-			// updateRect.bottom -= MIN(updateRect.bottom, wfc->yCurrentScroll);
+		// updateRect.top -= MIN(updateRect.top, wfc->yCurrentScroll);
+		// updateRect.bottom -= MIN(updateRect.bottom, wfc->yCurrentScroll);
 		// }
-		
+
 		wf_scale_rect(wfc, &updateRect);
-		
-		WLog_VRB("wf_client", "wf_end_paint() %d,%d,%d,%d", updateRect.left, updateRect.top, updateRect.right, updateRect.bottom);
-		
+
+		WLog_VRB("wf_client", "wf_end_paint() %d,%d,%d,%d", updateRect.left, updateRect.top,
+		         updateRect.right, updateRect.bottom);
+
 		// just do entire window?
 		// RECT windowRect;
 		// GetClientRect(wfc->hwnd, &windowRect);
@@ -312,7 +314,7 @@ static void wf_add_system_menu(wfContext* wfc)
 	}
 
 	hMenu = GetSystemMenu(wfc->hwnd, FALSE);
-	
+
 	if (wfc->common.context.settings->RemoteAssistanceMode)
 	{
 		ZeroMemory(&item_info_request_control, sizeof(MENUITEMINFO));
@@ -325,7 +327,7 @@ static void wf_add_system_menu(wfContext* wfc)
 		// item_info_request_control.dwItemData = (ULONG_PTR)wfc;
 		InsertMenuItem(hMenu, 6, TRUE, &item_info_request_control);
 	}
-	
+
 	ZeroMemory(&item_info, sizeof(MENUITEMINFO));
 	item_info.fMask = MIIM_CHECKMARKS | MIIM_FTYPE | MIIM_ID | MIIM_STRING | MIIM_DATA;
 	item_info.cbSize = sizeof(MENUITEMINFO);
@@ -340,7 +342,6 @@ static void wf_add_system_menu(wfContext* wfc)
 	{
 		CheckMenuItem(hMenu, SYSCOMMAND_ID_SMARTSIZING, MF_CHECKED);
 	}
-
 }
 
 static WCHAR* wf_window_get_title(rdpSettings* settings)
@@ -471,7 +472,7 @@ static BOOL wf_post_connect(freerdp* instance)
 	}
 
 	wfc->floatbar = wf_floatbar_new(wfc, wfc->hInstance, settings->Floatbar);
-		
+
 	return TRUE;
 }
 

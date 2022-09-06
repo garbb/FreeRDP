@@ -280,7 +280,7 @@ void wf_invalidate_region(wfContext* wfc, UINT32 x, UINT32 y, UINT32 width, UINT
 void wf_update_offset(wfContext* wfc)
 {
 	WLog_VRB("wf_gdi", "wf_update_offset");
-	
+
 	rdpSettings* settings;
 	settings = wfc->common.context.settings;
 
@@ -325,7 +325,7 @@ void wf_update_offset(wfContext* wfc)
 void wf_resize_window(wfContext* wfc)
 {
 	WLog_VRB("wf_gdi", "wf_resize_window");
-	
+
 	rdpSettings* settings;
 	settings = wfc->common.context.settings;
 
@@ -394,7 +394,7 @@ void wf_resize_window(wfContext* wfc)
 			wfc->client_y = 10;
 
 		wf_update_canvas_diff(wfc);
-		
+
 		/* Now resize to get full canvas size and room for caption and borders */
 		int width, height;
 		if (settings->SmartSizing && settings->SmartSizingWidth && settings->SmartSizingHeight)
@@ -407,7 +407,7 @@ void wf_resize_window(wfContext* wfc)
 			width = wfc->client_width + wfc->diff.x;
 			height = wfc->client_height + wfc->diff.y;
 		}
-		
+
 		int xpos, ypos;
 		WLog_DBG(TAG, "int xpos, ypos; %d %d", settings->DesktopPosX, settings->DesktopPosY);
 		// if ((settings->DesktopPosX != UINT32_MAX) && (settings->DesktopPosY != UINT32_MAX))
@@ -422,9 +422,7 @@ void wf_resize_window(wfContext* wfc)
 			ypos = wfc->client_y;
 		}
 		WLog_DBG(TAG, "SetWindowPos %d %d", xpos, ypos);
-		SetWindowPos(wfc->hwnd, HWND_TOP, xpos, ypos,
-		             width, height,
-		             0 /*SWP_FRAMECHANGED*/);
+		SetWindowPos(wfc->hwnd, HWND_TOP, xpos, ypos, width, height, 0 /*SWP_FRAMECHANGED*/);
 		// wf_size_scrollbars(wfc,  wfc->client_width, wfc->client_height);
 	}
 
@@ -481,8 +479,10 @@ static BOOL wf_gdi_set_bounds(rdpContext* context, const rdpBounds* bounds)
 	if (!context || !bounds)
 	{
 		WLog_VRB(TAG, "wf_gdi_set_bounds FALSE");
-		if (!context) WLog_VRB(TAG, "wf_gdi_set_bounds invalid context");
-		if (!bounds) WLog_VRB(TAG, "wf_gdi_set_bounds invalid bounds");
+		if (!context)
+			WLog_VRB(TAG, "wf_gdi_set_bounds invalid context");
+		if (!bounds)
+			WLog_VRB(TAG, "wf_gdi_set_bounds invalid bounds");
 		return FALSE;
 	}
 
@@ -575,7 +575,7 @@ static BOOL wf_gdi_scrblt(rdpContext* context, const SCRBLT_ORDER* scrblt)
 static BOOL wf_gdi_opaque_rect(rdpContext* context, const OPAQUE_RECT_ORDER* opaque_rect)
 {
 	WLog_DBG(TAG, "wf_gdi_opaque_rect()");
-	
+
 	RECT rect;
 	HBRUSH brush;
 	COLORREF brush_color;
@@ -600,7 +600,7 @@ static BOOL wf_gdi_opaque_rect(rdpContext* context, const OPAQUE_RECT_ORDER* opa
 		                     rect.bottom - rect.top + 1);
 
 	WLog_DBG(TAG, "wf_gdi_opaque_rect() TRUE");
-							 
+
 	return TRUE;
 }
 
@@ -856,7 +856,7 @@ void wf_gdi_register_update_callbacks(rdpUpdate* update)
 void wf_update_canvas_diff(wfContext* wfc)
 {
 	WLog_VRB("wf_gdi", "wf_update_canvas_diff");
-	
+
 	RECT rc_client, rc_wnd;
 	int dx, dy;
 	GetClientRect(wfc->hwnd, &rc_client);
