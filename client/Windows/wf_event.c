@@ -767,12 +767,25 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 			{
 				if (wParam == SYSCOMMAND_ID_SMARTSIZING)
 				{
+					WLog_VRB("wf_event", "WM_SYSCOMMAND SYSCOMMAND_ID_SMARTSIZING");
+					
 					HMENU hMenu = GetSystemMenu(wfc->hwnd, FALSE);
 					freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SmartSizing,
 					                          !wfc->common.context.settings->SmartSizing);
 					CheckMenuItem(hMenu, SYSCOMMAND_ID_SMARTSIZING,
 					              wfc->common.context.settings->SmartSizing ? MF_CHECKED
 					                                                        : MF_UNCHECKED);
+					if (!wfc->common.context.settings->SmartSizing)
+					{
+						SetWindowPos(wfc->hwnd, HWND_TOP, -1, -1, wfc->common.context.settings->DesktopWidth + wfc->diff.x,
+									 wfc->common.context.settings->DesktopHeight + wfc->diff.y, SWP_NOMOVE);
+					}
+					else
+					{
+						wf_size_scrollbars(wfc, wfc->client_width, wfc->client_height);
+						wf_send_resize(wfc);
+					}
+
 				}
 				else if  (wParam == SYSCOMMAND_ID_REQUEST_CONTROL)
 				{
