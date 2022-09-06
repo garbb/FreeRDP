@@ -339,19 +339,21 @@ static UINT remdesk_recv_ctl_result_pdu(remdeskPlugin* remdesk, wStream* s,
 	WINPR_ASSERT(pResult);
 
 	if (!Stream_CheckAndLogRequiredLength(TAG, s, 4))
-		return ERROR_INVALID_DATA;	//  0x0000000D
+		return ERROR_INVALID_DATA; //  0x0000000D
 
 	Stream_Read_UINT32(s, result); /* result (4 bytes) */
 	*pResult = result;
-	WLog_DBG(TAG, "RemdeskRecvResult: 0x%08"PRIX32"", result);
+	WLog_DBG(TAG, "RemdeskRecvResult: 0x%08" PRIX32 "", result);
 
 	switch (result)
 	{
 		case REMDESK_ERROR_HELPEESAIDNO:
 			WLog_DBG(TAG, "remote assistance connection request was denied");
-			
+
 #ifdef _WIN32
-			MessageBox(((wfContext*)remdesk->rdpcontext)->hwnd, L"Remote assistance connection request was denied", L"Remote Assistance", MB_ICONERROR | MB_SETFOREGROUND);
+			MessageBox(((wfContext*)remdesk->rdpcontext)->hwnd,
+			           L"Remote assistance connection request was denied", L"Remote Assistance",
+			           MB_ICONERROR | MB_SETFOREGROUND);
 #endif
 			return ERROR_CONNECTION_REFUSED;
 			break;
@@ -612,7 +614,7 @@ static UINT remdesk_recv_ctl_pdu(remdeskPlugin* remdesk, wStream* s, REMDESK_CHA
 
 	Stream_Read_UINT32(s, msgType); /* msgType (4 bytes) */
 
-	WLog_DBG(TAG, "msgType: %"PRIu32"", msgType);
+	WLog_DBG(TAG, "msgType: %" PRIu32 "", msgType);
 
 	switch (msgType)
 	{
@@ -735,7 +737,7 @@ static UINT remdesk_process_receive(remdeskPlugin* remdesk, wStream* s)
 	WINPR_ASSERT(s);
 
 #if 1
-	WLog_DBG(TAG, "RemdeskReceive: %"PRIuz"", Stream_GetRemainingLength(s));
+	WLog_DBG(TAG, "RemdeskReceive: %" PRIuz "", Stream_GetRemainingLength(s));
 	winpr_HexDump(TAG, WLOG_DEBUG, Stream_Buffer(s), Stream_Length(s));
 #endif
 
