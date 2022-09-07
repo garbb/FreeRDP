@@ -615,7 +615,7 @@ static BOOL wf_gw_authenticate(freerdp* instance, char** username, char** passwo
 	return wf_authenticate_raw(instance, tmp, username, password, domain);
 }
 
-static WCHAR* wf_format_text(const WCHAR* fmt, ...)
+WCHAR* wf_format_text(const WCHAR* fmt, ...)
 {
 	int rc;
 	size_t size = 0;
