@@ -71,7 +71,7 @@ wf_encomsp_participant_created(EncomspClientContext* context,
 
 	wfContext* wf;
 	rdpSettings* settings;
-	static BOOL requestedOnce = FALSE;
+	static BOOL controlAutoRequested = FALSE;
 
 	if (!context || !context->custom || !participantCreated)
 		return ERROR_INVALID_PARAMETER;
@@ -80,20 +80,18 @@ wf_encomsp_participant_created(EncomspClientContext* context,
 	WINPR_ASSERT(wf);
 
 	settings = wf->common.context.settings;
-
-	if (!settings)
-		return ERROR_INVALID_PARAMETER;
+	WINPR_ASSERT(settings);
 
 	if ((participantCreated->Flags & ENCOMSP_MAY_VIEW) &&
 	    !(participantCreated->Flags & ENCOMSP_MAY_INTERACT))
 	{
 		// if auto-request-control setting is enabled then only request control once upon connect,
-		// otherwise it will request control again every time server turns off control which is a
-		// bit annoying
-		if (!requestedOnce &&
+		// otherwise it will auto request control again every time server turns off control which
+		// is a bit annoying
+		if (!controlAutoRequested &&
 		    freerdp_settings_get_bool(settings, FreeRDP_RemoteAssistanceRequestControl))
 		{
-			requestedOnce = TRUE;
+			controlAutoRequested = TRUE;
 			if (!encomsp_toggle_control(context))
 				return ERROR_INTERNAL_ERROR;
 		}
