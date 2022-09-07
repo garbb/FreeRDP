@@ -682,16 +682,6 @@ const char* freerdp_get_error_info_name(UINT32 code)
 	return "ERRINFO_UNKNOWN";
 }
 
-#ifdef _WIN32
-static wchar_t* _mbstowcs(const char* vIn)
-{
-	wchar_t vOut[1024];
-	mbstowcs_s(NULL,vOut,strlen(vIn)+1,vIn,strlen(vIn));
-	
-	return vOut;
-}
-#endif
-
 void rdp_print_errinfo(UINT32 code)
 {
 	const ERRINFO* errInfo;
@@ -703,11 +693,13 @@ void rdp_print_errinfo(UINT32 code)
 		{
 			WLog_INFO(TAG, "%s (0x%08" PRIX32 "):%s", errInfo->name, code, errInfo->info);
 #ifdef _WIN32
-			const char output[256];
-			sprintf(output, "%s (0x%08" PRIX32 "):%s", errInfo->name, code, errInfo->info);
+			const char vIn[256];
+			sprintf(vIn, "%s (0x%08" PRIX32 "):%s", errInfo->name, code, errInfo->info);
+			wchar_t vOut[1024];
+			mbstowcs(vOut, vIn, strlen(vIn));
 	
 			MessageBoxW(NULL,
-			           _mbstowcs(output), L"Remote Assistance",
+			           vOut, L"Remote Assistance",
 			           MB_ICONERROR | MB_SETFOREGROUND);
 #endif
 			return;
