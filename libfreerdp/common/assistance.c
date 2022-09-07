@@ -1099,6 +1099,15 @@ int freerdp_assistance_parse_file_buffer(rdpAssistanceFile* file, const char* bu
 		if (status < 0)
 		{
 			WLog_ERR(TAG, "freerdp_assistance_parse_connection_string1 failure: %d", status);
+#ifdef _WIN32
+			const char* vIn = "freerdp_assistance_parse_connection_string1 failure.  \nMaybe incorrect assistance password?";
+			wchar_t vOut[1024];
+			mbstowcs(vOut, vIn, strlen(vIn));
+
+			MessageBoxW(NULL,
+			           vOut, L"Remote Assistance",
+			           MB_ICONERROR | MB_SETFOREGROUND);
+#endif
 			return -1;
 		}
 

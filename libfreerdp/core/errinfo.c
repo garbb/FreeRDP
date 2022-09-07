@@ -25,10 +25,6 @@
 
 #include "errinfo.h"
 
-#ifdef _WIN32
-#include "../../client/Windows/wf_client.h"
-#endif
-
 #define TAG FREERDP_TAG("core")
 
 #define ERRINFO_DEFINE(_code, category)                                        \
@@ -697,9 +693,9 @@ void rdp_print_errinfo(UINT32 code)
 			sprintf(vIn, "%s (0x%08" PRIX32 "):%s", errInfo->name, code, errInfo->info);
 			wchar_t vOut[1024];
 			mbstowcs(vOut, vIn, strlen(vIn));
-	
+
 			MessageBoxW(NULL,
-			           vOut, L"Remote Assistance",
+			           vOut, L"wfreerdp",
 			           MB_ICONERROR | MB_SETFOREGROUND);
 #endif
 			return;

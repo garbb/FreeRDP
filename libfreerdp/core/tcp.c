@@ -1173,6 +1173,18 @@ int freerdp_tcp_default_connect(rdpContext* context, rdpSettings* settings, cons
 				freerdp_set_last_error_if_not(context, FREERDP_ERROR_CONNECT_FAILED);
 
 				WLog_ERR(TAG, "failed to connect to %s", hostname);
+				
+#ifdef _WIN32
+			const char vIn[256];
+			sprintf(vIn, "failed to connect to %s", hostname);
+			wchar_t vOut[1024];
+			mbstowcs(vOut, vIn, strlen(vIn));
+
+			MessageBoxW(NULL,
+			           vOut, L"wfreerdp",
+			           MB_ICONERROR | MB_SETFOREGROUND);
+#endif
+				
 				return -1;
 			}
 
@@ -1191,6 +1203,17 @@ int freerdp_tcp_default_connect(rdpContext* context, rdpSettings* settings, cons
 		freerdp_set_last_error_if_not(context, FREERDP_ERROR_CONNECT_FAILED);
 
 		WLog_ERR(TAG, "Couldn't get socket ip address");
+		
+#ifdef _WIN32
+			const char* vIn = "Couldn't get socket ip address";
+			wchar_t vOut[1024];
+			mbstowcs(vOut, vIn, strlen(vIn));
+
+			MessageBoxW(NULL,
+			           vOut, L"wfreerdp",
+			           MB_ICONERROR | MB_SETFOREGROUND);
+#endif
+		
 		return -1;
 	}
 
