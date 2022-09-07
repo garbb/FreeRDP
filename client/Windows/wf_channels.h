@@ -33,7 +33,6 @@
 void wf_OnChannelConnectedEventHandler(void* context, const ChannelConnectedEventArgs* e);
 void wf_OnChannelDisconnectedEventHandler(void* context, const ChannelDisconnectedEventArgs* e);
 
-// BOOL encomsp_toggle_control(EncomspClientContext* encomsp, BOOL control);
 BOOL encomsp_request_control(void* wf, BOOL request);
 BOOL encomsp_toggle_control(EncomspClientContext* encomsp);
 

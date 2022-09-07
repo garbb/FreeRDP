@@ -40,7 +40,6 @@ BOOL encomsp_request_control(wfContext* wf, BOOL request)
 	if (!encomsp)
 		return FALSE;
 
-	// wfContext* wf = (wfContext*)encomsp->custom;
 	if (!wf->common.context.settings->RemoteAssistanceMode)
 		return FALSE;
 
