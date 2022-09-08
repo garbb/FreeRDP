@@ -476,13 +476,21 @@ static BOOL wf_gdi_set_bounds(rdpContext* context, const rdpBounds* bounds)
 	HRGN hrgn;
 	wfContext* wfc = (wfContext*)context;
 
-	if (!context || !bounds)
+	// if (!context || !bounds)
+	// {
+		// WLog_VRB(TAG, "wf_gdi_set_bounds FALSE");
+		// if (!context)
+			// WLog_VRB(TAG, "wf_gdi_set_bounds invalid context");
+		// if (!bounds)
+			// WLog_VRB(TAG, "wf_gdi_set_bounds invalid bounds");
+		// return FALSE;
+	// }
+
+	if (!context)
 	{
 		WLog_VRB(TAG, "wf_gdi_set_bounds FALSE");
 		if (!context)
 			WLog_VRB(TAG, "wf_gdi_set_bounds invalid context");
-		if (!bounds)
-			WLog_VRB(TAG, "wf_gdi_set_bounds invalid bounds");
 		return FALSE;
 	}
 
