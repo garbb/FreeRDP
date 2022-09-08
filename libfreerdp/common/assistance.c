@@ -773,7 +773,6 @@ int freerdp_assistance_parse_file_buffer(rdpAssistanceFile* file, const char* bu
 	char* p;
 	char* q;
 	char* r;
-	char* amp;
 	int status;
 	size_t length;
 
@@ -928,7 +927,7 @@ int freerdp_assistance_parse_file_buffer(rdpAssistanceFile* file, const char* bu
 			p += sizeof("PassStub=\"") - 1;
 
 			// needs to be unescaped (&amp; => &)
-			amp = strstr(p, "&amp;");
+			char* amp = strstr(p, "&amp;");
 
 			q = strchr(p, '"');
 
@@ -945,15 +944,7 @@ int freerdp_assistance_parse_file_buffer(rdpAssistanceFile* file, const char* bu
 				return -1;
 			}
 
-			if (amp)
-			{
-				length = q - p - 4;
-			}
-			else
-			{
-				length = q - p;
-			}
-			WLog_DBG(TAG, "PassStub length=%d", length);
+			length = q - p - (amp ? 4 : 0);
 
 			file->PassStub = (char*)malloc(length + 1);
 
