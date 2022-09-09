@@ -303,7 +303,7 @@ static void wf_append_item_to_system_menu(HMENU hMenu, UINT fMask, UINT wID, con
 	// initial windows system item position where we will insert new menu item
 	// after default 5 items (restore, move, size, minimize, maximize)
 	// gets incremented each time this function is called
-	// or maybe could use GetMenuItemCount() ?
+	// or maybe could use GetMenuItemCount() to get initial item count ?
 	static UINT position = 6;
 
 	MENUITEMINFO item_info;

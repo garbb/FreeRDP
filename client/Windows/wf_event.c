@@ -296,7 +296,10 @@ void wf_event_focus_in(wfContext* wfc)
 	GetClientRect(wfc->hwnd, &rc);
 
 	if (pt.x >= rc.left && pt.x < rc.right && pt.y >= rc.top && pt.y < rc.bottom)
+	{
+		wf_scale_mouse_pos(wfc, &(pt.x), &(pt.y));
 		input->MouseEvent(input, PTR_FLAGS_MOVE, (UINT16)pt.x, (UINT16)pt.y);
+	}
 }
 
 static BOOL wf_event_process_WM_MOUSEWHEEL(wfContext* wfc, HWND hWnd, UINT Msg, WPARAM wParam,
