@@ -273,14 +273,8 @@ static BOOL wf_pre_connect(freerdp* instance)
 }
 
 static void wf_append_item_to_system_menu(HMENU hMenu, UINT fMask, UINT wID, const wchar_t* text,
-                                          void* dwItemData)
+                                          wfContext* wfc)
 {
-	// initial windows system item position where we will insert new menu item
-	// after default 5 items (restore, move, size, minimize, maximize)
-	// gets incremented each time this function is called
-	// or maybe could use GetMenuItemCount() to get initial item count ?
-	static UINT position = 6;
-
 	MENUITEMINFO item_info;
 
 	ZeroMemory(&item_info, sizeof(MENUITEMINFO));
@@ -290,15 +284,14 @@ static void wf_append_item_to_system_menu(HMENU hMenu, UINT fMask, UINT wID, con
 	item_info.fType = MFT_STRING;
 	item_info.dwTypeData = _wcsdup(text);
 	item_info.cch = (UINT)_wcslen(text);
-	if (dwItemData)
-		item_info.dwItemData = (ULONG_PTR)dwItemData;
-	InsertMenuItem(hMenu, position++, TRUE, &item_info);
+	if (wfc)
+		item_info.dwItemData = (ULONG_PTR)wfc;
+	InsertMenuItem(hMenu, wfc->systemMenuInsertPosition++, TRUE, &item_info);
 }
 
 static void wf_add_system_menu(wfContext* wfc)
 {
 	HMENU hMenu;
-	MENUITEMINFO item_info;
 
 	if (wfc->fullscreen && !wfc->fullscreen_toggle)
 	{
@@ -317,11 +310,13 @@ static void wf_add_system_menu(wfContext* wfc)
 	                              SYSCOMMAND_ID_SMARTSIZING, L"Smart sizing", wfc);
 
 	if (wfc->common.context.settings->SmartSizing)
+	{
 		CheckMenuItem(hMenu, SYSCOMMAND_ID_SMARTSIZING, MF_CHECKED);
+	}
 
 	if (wfc->common.context.settings->RemoteAssistanceMode)
 		wf_append_item_to_system_menu(hMenu, MIIM_FTYPE | MIIM_ID | MIIM_STRING,
-		                              SYSCOMMAND_ID_REQUEST_CONTROL, L"Request control", NULL);
+		                              SYSCOMMAND_ID_REQUEST_CONTROL, L"Request control", wfc);
 }
 
 static WCHAR* wf_window_get_title(rdpSettings* settings)
@@ -1375,6 +1370,13 @@ static int wfreerdp_client_start(rdpContext* context)
 	hWndParent = (HWND)context->settings->ParentWindowId;
 	context->settings->EmbeddedWindow = (hWndParent) ? TRUE : FALSE;
 	wfc->hWndParent = hWndParent;
+
+	/* initial windows system item position where we will insert new menu item
+	 * after default 5 items (restore, move, size, minimize, maximize)
+	 * gets incremented each time this function is called
+	 * or maybe could use GetMenuItemCount() to get initial item count ? */
+	wfc->systemMenuInsertPosition = 6;
+
 	wfc->hInstance = hInstance;
 	wfc->cursor = LoadCursor(NULL, IDC_ARROW);
 	wfc->icon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
