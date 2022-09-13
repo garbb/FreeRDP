@@ -272,7 +272,7 @@ static BOOL wf_pre_connect(freerdp* instance)
 	return TRUE;
 }
 
-sstatic void wf_append_item_to_system_menu(HMENU hMenu, UINT fMask, UINT wID, const wchar_t* text,
+static void wf_append_item_to_system_menu(HMENU hMenu, UINT fMask, UINT wID, const wchar_t* text,
                                           void* dwItemData)
 {
 	// initial windows system item position where we will insert new menu item
