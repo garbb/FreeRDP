@@ -147,6 +147,7 @@ static BOOL wf_end_paint(rdpContext* context)
 
 	region16_uninit(&invalidRegion);
 
+	// will only run once on first show of window
 	if (!wfc->is_shown)
 	{
 		wfc->is_shown = TRUE;
@@ -160,6 +161,7 @@ static BOOL wf_end_paint(rdpContext* context)
 #endif
 
 		ShowWindow(wfc->hwnd, context->settings->MaximizeWindow ? SW_MAXIMIZE : SW_SHOWNORMAL);
+		// ShowWindow(wfc->hwnd, SW_SHOWNORMAL);
 		WLog_INFO(TAG, "Window is shown!");
 		fflush(stdout);
 	}
@@ -456,7 +458,8 @@ static BOOL wf_post_connect(freerdp* instance)
 #ifdef WITH_PROGRESS_BAR
 	if (wfc->taskBarList)
 	{
-		ShowWindow(wfc->hwnd, settings->MaximizeWindow ? SW_MAXIMIZE : SW_SHOW);
+		ShowWindow(wfc->hwnd, settings->MaximizeWindow ? SW_MAXIMIZE : SW_SHOWNORMAL);
+		// ShowWindow(wfc->hwnd, SW_SHOWMINIMIZED);
 		wfc->taskBarList->lpVtbl->SetProgressState(wfc->taskBarList, wfc->hwnd, TBPF_INDETERMINATE);
 	}
 #endif

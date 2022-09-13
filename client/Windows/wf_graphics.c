@@ -294,6 +294,8 @@ static BOOL wf_Pointer_Free(rdpContext* context, rdpPointer* pointer)
 
 static BOOL wf_Pointer_Set(rdpContext* context, rdpPointer* pointer)
 {
+	WLog_DBG(TAG, "wf_Pointer_Set");
+	
 	HCURSOR hCur;
 	wfContext* wfc = (wfContext*)context;
 
@@ -337,6 +339,8 @@ static BOOL wf_Pointer_SetPosition(rdpContext* context, UINT32 x, UINT32 y)
 
 BOOL wf_register_pointer(rdpGraphics* graphics)
 {
+	WLog_DBG(TAG, "wf_register_pointer");
+	
 	wfContext* wfc;
 	rdpPointer pointer;
 

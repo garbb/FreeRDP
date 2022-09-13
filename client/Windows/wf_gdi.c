@@ -387,11 +387,11 @@ void wf_resize_window(wfContext* wfc)
 		if (!wfc->client_width)
 			wfc->client_width = settings->DesktopWidth;
 
-		if (!wfc->client_x)
-			wfc->client_x = 10;
+		// if (!wfc->client_x)
+			// wfc->client_x = 10;
 
-		if (!wfc->client_y)
-			wfc->client_y = 10;
+		// if (!wfc->client_y)
+			// wfc->client_y = 10;
 
 		wf_update_canvas_diff(wfc);
 
@@ -411,16 +411,16 @@ void wf_resize_window(wfContext* wfc)
 		int xpos, ypos;
 		WLog_DBG(TAG, "int xpos, ypos; %d %d", settings->DesktopPosX, settings->DesktopPosY);
 		// if ((settings->DesktopPosX != UINT32_MAX) && (settings->DesktopPosY != UINT32_MAX))
-		if (settings->DesktopPosX && settings->DesktopPosY)
-		{
+		// if (settings->DesktopPosX && settings->DesktopPosY)
+		// {
 			xpos = settings->DesktopPosX;
 			ypos = settings->DesktopPosY;
-		}
-		else
-		{
-			xpos = wfc->client_x;
-			ypos = wfc->client_y;
-		}
+		// }
+		// else
+		// {
+			// xpos = wfc->client_x;
+			// ypos = wfc->client_y;
+		// }
 		WLog_DBG(TAG, "SetWindowPos %d %d", xpos, ypos);
 		SetWindowPos(wfc->hwnd, HWND_TOP, xpos, ypos, width, height, 0 /*SWP_FRAMECHANGED*/);
 		// wf_size_scrollbars(wfc,  wfc->client_width, wfc->client_height);
