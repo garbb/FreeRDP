@@ -1373,7 +1373,7 @@ static int wfreerdp_client_start(rdpContext* context)
 
 	/* initial windows system item position where we will insert new menu item
 	 * after default 5 items (restore, move, size, minimize, maximize)
-	 * gets incremented each time this function is called
+	 * gets incremented each time wf_append_item_to_system_menu is called
 	 * or maybe could use GetMenuItemCount() to get initial item count ? */
 	wfc->systemMenuInsertPosition = 6;
 
