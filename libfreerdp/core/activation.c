@@ -110,6 +110,8 @@ BOOL rdp_recv_client_synchronize_pdu(rdpRdp* rdp, wStream* s)
 
 BOOL rdp_send_client_synchronize_pdu(rdpRdp* rdp)
 {
+	WLog_DBG(TAG, "rdp_send_client_synchronize_pdu");
+	
 	wStream* s = rdp_data_pdu_init(rdp);
 	if (!s)
 		return FALSE;

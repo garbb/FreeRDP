@@ -217,6 +217,8 @@ out_fail:
 
 static BOOL update_pointer_new(rdpContext* context, const POINTER_NEW_UPDATE* pointer_new)
 {
+	WLog_DBG(TAG, "update_pointer_new");
+	
 	rdpPointer* pointer;
 	rdpCache* cache;
 
@@ -255,6 +257,8 @@ out_fail:
 
 static BOOL update_pointer_cached(rdpContext* context, const POINTER_CACHED_UPDATE* pointer_cached)
 {
+	WLog_DBG(TAG, "update_pointer_cached");
+	
 	rdpPointer* pointer;
 	rdpCache* cache;
 

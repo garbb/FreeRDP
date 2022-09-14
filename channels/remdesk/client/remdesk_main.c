@@ -600,6 +600,8 @@ static UINT remdesk_send_ctl_expert_on_vista_pdu(remdeskPlugin* remdesk)
 static UINT remdesk_recv_ctl_pdu(remdeskPlugin* remdesk, wStream* s, REMDESK_CHANNEL_HEADER* header)
 {
 	WLog_DBG(TAG, "remdesk_recv_ctl_pdu");
+	
+	// rdp_send_client_synchronize_pdu(remdesk->rdpcontext->rdp);
 
 	UINT error = CHANNEL_RC_OK;
 	UINT32 msgType = 0;

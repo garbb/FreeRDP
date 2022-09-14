@@ -145,6 +145,7 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 							if (p->time - last_key_up_time <= 250)
 							{
 								DEBUG_KBD("DEFOCUS");
+								// rdp_send_client_synchronize_pdu(wfc->common.context.rdp);
 								SetForegroundWindow(FindWindow(L"Shell_TrayWnd", NULL));
 							}
 						}
@@ -165,6 +166,7 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 							if (p->time - last_key_up_time <= 250)
 							{
 								DEBUG_KBD("DEFOCUS");
+								// rdp_send_client_synchronize_pdu(wfc->common.context.rdp);
 								SetForegroundWindow(FindWindow(L"Shell_TrayWnd", NULL));
 							}
 						}
@@ -838,6 +840,8 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 			WLog_VRB("wf_event", "WM_SETFOCUS");
 			DEBUG_KBD("getting focus %X", hWnd);
 			freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, FALSE);
+			
+			// rdp_send_client_synchronize_pdu(wfc->common.context);
 
 			if (alt_ctrl_down())
 				g_flipping_in = TRUE;

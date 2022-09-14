@@ -98,6 +98,8 @@ extern "C"
 		LPCTSTR wndClassName;
 		HCURSOR hDefaultCursor;
 
+		UINT systemMenuInsertPosition;
+
 		HWND hwnd;
 		BOOL is_shown;
 		ITaskbarList3* taskBarList;
