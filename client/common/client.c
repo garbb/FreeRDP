@@ -57,6 +57,10 @@
 #include <freerdp/log.h>
 #define TAG CLIENT_TAG("common")
 
+#ifdef _WIN32
+#include "../client/Windows/wf_client.h"
+#endif
+
 static BOOL freerdp_client_common_new(freerdp* instance, rdpContext* context)
 {
 	RDP_CLIENT_ENTRY_POINTS* pEntryPoints;
@@ -880,11 +884,14 @@ BOOL client_cli_present_gateway_message(freerdp* instance, UINT32 type, BOOL isD
 
 BOOL client_auto_reconnect(freerdp* instance)
 {
+	WLog_DBG(TAG, "client_auto_reconnect");
 	return client_auto_reconnect_ex(instance, NULL);
 }
 
 BOOL client_auto_reconnect_ex(freerdp* instance, BOOL (*window_events)(freerdp* instance))
 {
+	WLog_DBG(TAG, "client_auto_reconnect_ex");
+	
 	BOOL retry = TRUE;
 	UINT32 error;
 	UINT32 maxRetries;
@@ -920,6 +927,12 @@ BOOL client_auto_reconnect_ex(freerdp* instance, BOOL (*window_events)(freerdp* 
 
 	if (!settings->AutoReconnectionEnabled)
 	{
+		
+#ifdef _WIN32
+			MessageBox(((wfContext*)instance->context)->hwnd,
+			           L"Network Disconnect", L"wfreerdp",
+			           MB_ICONERROR | MB_SETFOREGROUND);
+#endif
 		/* No auto-reconnect - just quit */
 		return FALSE;
 	}

@@ -302,9 +302,7 @@ static BOOL wf_pre_connect(freerdp* instance)
 static void wf_append_item_to_system_menu(HMENU hMenu, UINT fMask, UINT wID, const wchar_t* text,
                                           wfContext* wfc)
 {
-	MENUITEMINFO item_info;
-
-	ZeroMemory(&item_info, sizeof(MENUITEMINFO));
+	MENUITEMINFO item_info = { 0 };
 	item_info.fMask = fMask;
 	item_info.cbSize = sizeof(MENUITEMINFO);
 	item_info.wID = wID;
