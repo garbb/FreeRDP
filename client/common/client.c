@@ -1016,12 +1016,10 @@ BOOL freerdp_client_encomsp_set_control(EncomspClientContext* encomsp, BOOL cont
 	if (!encomsp)
 		return FALSE;
 	
-	WLog_DBG(TAG, "freerdp_client_encomsp_set_control 1");
-
-	// pdu.ParticipantId = 0;
 	pdu.ParticipantId = encomsp->participantId;
-	pdu.Flags = ENCOMSP_REQUEST_VIEW;
+	WLog_DBG(TAG, "freerdp_client_encomsp_set_control participantId=%d", pdu.ParticipantId);
 
+	pdu.Flags = ENCOMSP_REQUEST_VIEW;
 	if (control)
 		pdu.Flags |= ENCOMSP_REQUEST_INTERACT;
 
@@ -1049,6 +1047,10 @@ client_encomsp_participant_created(EncomspClientContext* context,
 
 	settings = cctx->context.settings;
 	WINPR_ASSERT(settings);
+
+	// some hosts ignore ODTYPE_PARTICIPANT_CTRL_CHANGED request unless we use this same ParticipantId, so save it here
+	if (participantCreated->Flags & ENCOMSP_IS_PARTICIPANT)
+		context->participantId = participantCreated->ParticipantId;
 
 	request = freerdp_settings_get_bool(settings, FreeRDP_RemoteAssistanceRequestControl);
 	if (request && (participantCreated->Flags & ENCOMSP_MAY_VIEW) &&
