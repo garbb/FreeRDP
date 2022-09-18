@@ -1018,7 +1018,8 @@ BOOL freerdp_client_encomsp_set_control(EncomspClientContext* encomsp, BOOL cont
 	
 	WLog_DBG(TAG, "freerdp_client_encomsp_set_control 1");
 
-	pdu.ParticipantId = 0;
+	// pdu.ParticipantId = 0;
+	pdu.ParticipantId = encomsp->participantId;
 	pdu.Flags = ENCOMSP_REQUEST_VIEW;
 
 	if (control)

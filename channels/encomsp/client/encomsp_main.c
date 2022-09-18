@@ -519,6 +519,9 @@ static UINT encomsp_recv_participant_created_pdu(encomspPlugin* encomsp, wStream
 	WLog_DBG(TAG, "encomsp_recv_participant_created_pdu() ParticipantId=%d, GroupId=%d, Flags=%d",
 	         pdu.ParticipantId, pdu.GroupId, pdu.Flags);
 
+	// some servers reject change control level requests without using this same ParticipantId
+	context->participantId = pdu.ParticipantId;
+
 	if ((error = encomsp_read_unicode_string(s, &(pdu.FriendlyName))))
 	{
 		WLog_ERR(TAG, "encomsp_read_unicode_string failed with error %" PRIu32 "", error);
