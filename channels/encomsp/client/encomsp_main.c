@@ -664,7 +664,7 @@ static UINT encomsp_recv_change_participant_control_level_pdu(encomspPlugin* enc
 static UINT encomsp_send_change_participant_control_level_pdu(
     EncomspClientContext* context, const ENCOMSP_CHANGE_PARTICIPANT_CONTROL_LEVEL_PDU* pdu)
 {
-	WLog_DBG(TAG, "encomsp_send_change_participant_control_level_pdu");
+	WLog_DBG(TAG, "encomsp_send_change_participant_control_level_pdu flags=%d, ParticipantId=%d", pdu->Flags, pdu->ParticipantId);
 
 	wStream* s;
 	encomspPlugin* encomsp;

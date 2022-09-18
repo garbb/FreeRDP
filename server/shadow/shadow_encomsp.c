@@ -36,6 +36,8 @@ static UINT
 encomsp_change_participant_control_level(EncomspServerContext* context,
                                          ENCOMSP_CHANGE_PARTICIPANT_CONTROL_LEVEL_PDU* pdu)
 {
+	WLog_DBG(TAG, "encomsp_change_participant_control_level");
+	
 	BOOL inLobby;
 	BOOL mayView;
 	BOOL mayInteract;

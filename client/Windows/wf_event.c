@@ -807,7 +807,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 				}
 				else if (wParam == SYSCOMMAND_ID_REQUEST_CONTROL)
 				{
-					encomsp_request_control(wfc, TRUE);
+					freerdp_client_encomsp_set_control(wfc->common.encomsp, TRUE);
 				}
 				else
 				{
