@@ -968,7 +968,7 @@ static INLINE int progressive_decompress_tile_first(PROGRESSIVE_CONTEXT* progres
 	sub = context->flags & RFX_SUBBAND_DIFFING;
 	extrapolate = region->flags & RFX_DWT_REDUCE_EXTRAPOLATE;
 
-	WLog_Print(progressive->log, WLOG_DEBUG,
+	WLog_Print(progressive->log, WLOG_TRACE,
 	           "ProgressiveTile%s: quantIdx Y: %" PRIu8 " Cb: %" PRIu8 " Cr: %" PRIu8
 	           " xIdx: %" PRIu16 " yIdx: %" PRIu16 " flags: 0x%02" PRIX8 " quality: %" PRIu8
 	           " yLen: %" PRIu16 " cbLen: %" PRIu16 " crLen: %" PRIu16 " tailLen: %" PRIu16 "",
@@ -1374,7 +1374,7 @@ static INLINE int progressive_decompress_tile_upgrade(PROGRESSIVE_CONTEXT* progr
 	extrapolate = region->flags & RFX_DWT_REDUCE_EXTRAPOLATE;
 
 	tile->pass++;
-	WLog_Print(progressive->log, WLOG_DEBUG,
+	WLog_Print(progressive->log, WLOG_TRACE,
 	           "ProgressiveTileUpgrade: pass: %" PRIu16 " quantIdx Y: %" PRIu8 " Cb: %" PRIu8
 	           " Cr: %" PRIu8 " xIdx: %" PRIu16 " yIdx: %" PRIu16 " quality: %" PRIu8
 	           " ySrlLen: %" PRIu16 " yRawLen: %" PRIu16 " cbSrlLen: %" PRIu16 " cbRawLen: %" PRIu16
@@ -1714,7 +1714,7 @@ static INLINE int progressive_process_tiles(PROGRESSIVE_CONTEXT* progressive, wS
 		Stream_Read_UINT16(s, blockType);
 		Stream_Read_UINT32(s, blockLen);
 
-		WLog_Print(progressive->log, WLOG_DEBUG, "%s",
+		WLog_Print(progressive->log, WLOG_TRACE, "%s",
 		           progressive_get_block_type_string(blockType));
 
 		if (blockLen < 6)
