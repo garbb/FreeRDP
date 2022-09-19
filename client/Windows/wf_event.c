@@ -270,6 +270,49 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 	return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
 
+static BOOL wf_scale_mouse_pos(wfContext* wfc, UINT16* x, UINT16* y)
+{
+	int ww, wh, dw, dh;
+	rdpSettings* settings;
+
+	if (!wfc || !x || !y)
+		return FALSE;
+
+	settings = wfc->common.context.settings;
+
+	if (!settings)
+		return FALSE;
+
+	if ( *(INT16 *)x < 0)
+		*x = 0;
+	if ( *(INT16 *)y < 0)
+		*y = 0;
+
+	if (!wfc->client_width)
+		wfc->client_width = settings->DesktopWidth;
+
+	if (!wfc->client_height)
+		wfc->client_height = settings->DesktopHeight;
+
+	ww = wfc->client_width;
+	wh = wfc->client_height;
+	dw = settings->DesktopWidth;
+	dh = settings->DesktopHeight;
+
+	if (!settings->SmartSizing || ((ww == dw) && (wh == dh)))
+	{
+		*x += wfc->xCurrentScroll;
+		*y += wfc->yCurrentScroll;
+	}
+	else
+	{
+		*x = *x * dw / ww + wfc->xCurrentScroll;
+		*y = *y * dh / wh + wfc->yCurrentScroll;
+	}
+
+	return TRUE;
+}
+
 void wf_event_focus_in(wfContext* wfc)
 {
 	UINT16 syncFlags;
@@ -299,7 +342,7 @@ void wf_event_focus_in(wfContext* wfc)
 
 	if (pt.x >= rc.left && pt.x < rc.right && pt.y >= rc.top && pt.y < rc.bottom)
 	{
-		wf_scale_mouse_pos(wfc, &(pt.x), &(pt.y));
+		wf_scale_mouse_pos(wfc, &((UINT16)pt.x), &((UINT16)pt.y));
 		input->MouseEvent(input, PTR_FLAGS_MOVE, (UINT16)pt.x, (UINT16)pt.y);
 	}
 }
@@ -449,7 +492,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 		if (!g_main_hWnd)
 			g_main_hWnd = wfc->hwnd;
 
-		// WLog_VRB("wf_event", "%d", Msg);
+		// WLog_DBG("wf_event", "%x", Msg);
 
 		switch (Msg)
 		{
@@ -589,11 +632,13 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 			case WM_LBUTTONDOWN:
 				wf_scale_mouse_event(wfc, PTR_FLAGS_DOWN | PTR_FLAGS_BUTTON1,
 				                     X_POS(lParam) - wfc->offset_x, Y_POS(lParam) - wfc->offset_y);
+				SetCapture(wfc->hwnd);
 				break;
 
 			case WM_LBUTTONUP:
 				wf_scale_mouse_event(wfc, PTR_FLAGS_BUTTON1, X_POS(lParam) - wfc->offset_x,
 				                     Y_POS(lParam) - wfc->offset_y);
+				ReleaseCapture();
 				break;
 
 			case WM_RBUTTONDOWN:
@@ -610,6 +655,8 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 				// ignore repeated mousemove events if mouse has not moved
 				if (last_mousemove_lParam != lParam)
 				{
+					// WLog_DBG("WM_MOUSEMOVE", "%d,%d %d,%d %d,%d", (X_POS(lParam)), Y_POS(lParam), wfc->offset_x, wfc->offset_y, X_POS(lParam) - wfc->offset_x, Y_POS(lParam) - wfc->offset_y);
+					
 					wf_scale_mouse_event(wfc, PTR_FLAGS_MOVE, X_POS(lParam) - wfc->offset_x,
 					                     Y_POS(lParam) - wfc->offset_y);
 					last_mousemove_lParam = lParam;
@@ -930,44 +977,6 @@ BOOL wf_scale_blt(wfContext* wfc, HDC hdc, int x, int y, int w, int h, HDC hdcSr
 		SetStretchBltMode(hdc, HALFTONE);
 		SetBrushOrgEx(hdc, 0, 0, NULL);
 		return StretchBlt(hdc, 0, 0, ww, wh, wfc->primary->hdc, 0, 0, dw, dh, SRCCOPY);
-	}
-
-	return TRUE;
-}
-
-static BOOL wf_scale_mouse_pos(wfContext* wfc, UINT16* x, UINT16* y)
-{
-	int ww, wh, dw, dh;
-	rdpSettings* settings;
-
-	if (!wfc || !x || !y)
-		return FALSE;
-
-	settings = wfc->common.context.settings;
-
-	if (!settings)
-		return FALSE;
-
-	if (!wfc->client_width)
-		wfc->client_width = settings->DesktopWidth;
-
-	if (!wfc->client_height)
-		wfc->client_height = settings->DesktopHeight;
-
-	ww = wfc->client_width;
-	wh = wfc->client_height;
-	dw = settings->DesktopWidth;
-	dh = settings->DesktopHeight;
-
-	if (!settings->SmartSizing || ((ww == dw) && (wh == dh)))
-	{
-		*x += wfc->xCurrentScroll;
-		*y += wfc->yCurrentScroll;
-	}
-	else
-	{
-		*x = *x * dw / ww + wfc->xCurrentScroll;
-		*y = *y * dh / wh + wfc->yCurrentScroll;
 	}
 
 	return TRUE;

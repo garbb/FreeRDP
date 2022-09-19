@@ -339,7 +339,7 @@ static BOOL wf_Pointer_SetPosition(rdpContext* context, UINT32 x, UINT32 y)
 
 BOOL wf_register_pointer(rdpGraphics* graphics)
 {
-	WLog_DBG(TAG, "wf_register_pointer");
+	WLog_VRB(TAG, "wf_register_pointer");
 	
 	wfContext* wfc;
 	rdpPointer pointer;
