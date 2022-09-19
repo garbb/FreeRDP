@@ -25,6 +25,12 @@
 
 #include "errinfo.h"
 
+#ifdef _WIN32
+#include "../client/Windows/wf_client.h"
+#include <freerdp/freerdp.h>
+#include "rdp.h"
+#endif
+
 #define TAG FREERDP_TAG("core")
 
 #define ERRINFO_DEFINE(_code, category)                                        \
@@ -678,7 +684,7 @@ const char* freerdp_get_error_info_name(UINT32 code)
 	return "ERRINFO_UNKNOWN";
 }
 
-void rdp_print_errinfo(UINT32 code)
+void rdp_print_errinfo(UINT32 code, rdpRdp* rdp)
 {
 	const ERRINFO* errInfo;
 	errInfo = &ERRINFO_CODES[0];
@@ -696,7 +702,8 @@ void rdp_print_errinfo(UINT32 code)
 			wchar_t* vOut = (wchar_t *)malloc( (requiredSize + 1) * sizeof( wchar_t ));
 			mbstowcs(vOut, vIn, requiredSize + 1);
 
-			MessageBoxW(NULL,
+			// MessageBoxW(NULL,
+			MessageBoxW(((wfContext*)rdp->context)->hwnd,
 			           vOut, L"wfreerdp",
 			           MB_ICONERROR | MB_SETFOREGROUND);
 #endif

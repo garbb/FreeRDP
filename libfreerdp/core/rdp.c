@@ -383,7 +383,7 @@ BOOL rdp_set_error_info(rdpRdp* rdp, UINT32 errorInfo)
 		rdpContext* context = rdp->context;
 		WINPR_ASSERT(context);
 
-		rdp_print_errinfo(rdp->errorInfo);
+		rdp_print_errinfo(rdp->errorInfo, rdp);
 
 		if (context)
 		{

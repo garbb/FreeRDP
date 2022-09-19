@@ -31,6 +31,6 @@ typedef struct
 	const char* category;
 } ERRINFO;
 
-FREERDP_LOCAL void rdp_print_errinfo(UINT32 code);
+FREERDP_LOCAL void rdp_print_errinfo(UINT32 code, rdpRdp* rdp);
 
 #endif /* FREERDP_LIB_CORE_ERRINFO_H */
