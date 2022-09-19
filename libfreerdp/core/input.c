@@ -304,6 +304,8 @@ static BOOL input_send_keyboard_pause_event(rdpInput* input)
 
 static BOOL input_send_fastpath_synchronize_event(rdpInput* input, UINT32 flags)
 {
+	EnterCriticalSection(&input->context->rdp->critical2);
+
 	wStream* s;
 	rdpRdp* rdp;
 
@@ -322,11 +324,17 @@ static BOOL input_send_fastpath_synchronize_event(rdpInput* input, UINT32 flags)
 	if (!s)
 		return FALSE;
 
-	return fastpath_send_input_pdu(rdp->fastpath, s);
+	BOOL ret = fastpath_send_input_pdu(rdp->fastpath, s);
+
+	LeaveCriticalSection(&input->context->rdp->critical2);
+
+	return ret;
 }
 
 static BOOL input_send_fastpath_keyboard_event(rdpInput* input, UINT16 flags, UINT8 code)
 {
+	EnterCriticalSection(&input->context->rdp->critical2);
+
 	wStream* s;
 	BYTE eventFlags = 0;
 	rdpRdp* rdp;
@@ -350,11 +358,17 @@ static BOOL input_send_fastpath_keyboard_event(rdpInput* input, UINT16 flags, UI
 
 	WINPR_ASSERT(code <= UINT8_MAX);
 	Stream_Write_UINT8(s, (UINT8)code); /* keyCode (1 byte) */
-	return fastpath_send_input_pdu(rdp->fastpath, s);
+	BOOL ret = fastpath_send_input_pdu(rdp->fastpath, s);
+
+	LeaveCriticalSection(&input->context->rdp->critical2);
+
+	return ret;
 }
 
 static BOOL input_send_fastpath_unicode_keyboard_event(rdpInput* input, UINT16 flags, UINT16 code)
 {
+	EnterCriticalSection(&input->context->rdp->critical2);
+
 	wStream* s;
 	BYTE eventFlags = 0;
 	rdpRdp* rdp;
@@ -382,11 +396,17 @@ static BOOL input_send_fastpath_unicode_keyboard_event(rdpInput* input, UINT16 f
 		return FALSE;
 
 	Stream_Write_UINT16(s, code); /* unicodeCode (2 bytes) */
-	return fastpath_send_input_pdu(rdp->fastpath, s);
+	BOOL ret = fastpath_send_input_pdu(rdp->fastpath, s);
+
+	LeaveCriticalSection(&input->context->rdp->critical2);
+
+	return ret;
 }
 
 static BOOL input_send_fastpath_mouse_event(rdpInput* input, UINT16 flags, UINT16 x, UINT16 y)
 {
+	EnterCriticalSection(&input->context->rdp->critical2);
+
 	wStream* s;
 	rdpRdp* rdp;
 
@@ -418,12 +438,18 @@ static BOOL input_send_fastpath_mouse_event(rdpInput* input, UINT16 flags, UINT1
 		return FALSE;
 
 	input_write_mouse_event(s, flags, x, y);
-	return fastpath_send_input_pdu(rdp->fastpath, s);
+	BOOL ret = fastpath_send_input_pdu(rdp->fastpath, s);
+
+	LeaveCriticalSection(&input->context->rdp->critical2);
+
+	return ret;
 }
 
 static BOOL input_send_fastpath_extended_mouse_event(rdpInput* input, UINT16 flags, UINT16 x,
                                                      UINT16 y)
 {
+	EnterCriticalSection(&input->context->rdp->critical2);
+
 	wStream* s;
 	rdpRdp* rdp;
 
@@ -451,11 +477,17 @@ static BOOL input_send_fastpath_extended_mouse_event(rdpInput* input, UINT16 fla
 		return FALSE;
 
 	input_write_extended_mouse_event(s, flags, x, y);
-	return fastpath_send_input_pdu(rdp->fastpath, s);
+	BOOL ret = fastpath_send_input_pdu(rdp->fastpath, s);
+
+	LeaveCriticalSection(&input->context->rdp->critical2);
+
+	return ret;
 }
 
 static BOOL input_send_fastpath_focus_in_event(rdpInput* input, UINT16 toggleStates)
 {
+	EnterCriticalSection(&input->context->rdp->critical2);
+
 	wStream* s;
 	BYTE eventFlags = 0;
 	rdpRdp* rdp;
@@ -485,11 +517,17 @@ static BOOL input_send_fastpath_focus_in_event(rdpInput* input, UINT16 toggleSta
 	eventFlags = FASTPATH_INPUT_KBDFLAGS_RELEASE | FASTPATH_INPUT_EVENT_SCANCODE << 5;
 	Stream_Write_UINT8(s, eventFlags); /* Key Release event (1 byte) */
 	Stream_Write_UINT8(s, 0x0f);       /* keyCode (1 byte) */
-	return fastpath_send_multiple_input_pdu(rdp->fastpath, s, 3);
+	BOOL ret = fastpath_send_multiple_input_pdu(rdp->fastpath, s, 3);
+
+	LeaveCriticalSection(&input->context->rdp->critical2);
+
+	return ret;
 }
 
 static BOOL input_send_fastpath_keyboard_pause_event(rdpInput* input)
 {
+	EnterCriticalSection(&input->context->rdp->critical2);
+
 	/* In ancient days, pause-down without control sent E1 1D 45 E1 9D C5,
 	 * and pause-up sent nothing.  However, reverse engineering mstsc shows
 	 * it sending the following sequence:
@@ -525,7 +563,11 @@ static BOOL input_send_fastpath_keyboard_pause_event(rdpInput* input)
 	/* Numlock down (0x45) */
 	Stream_Write_UINT8(s, keyUpEvent);
 	Stream_Write_UINT8(s, RDP_SCANCODE_CODE(RDP_SCANCODE_NUMLOCK));
-	return fastpath_send_multiple_input_pdu(rdp->fastpath, s, 4);
+	BOOL ret = fastpath_send_multiple_input_pdu(rdp->fastpath, s, 4);
+
+	LeaveCriticalSection(&input->context->rdp->critical2);
+
+	return ret;
 }
 
 static BOOL input_recv_sync_event(rdpInput* input, wStream* s)

@@ -198,6 +198,7 @@ struct rdp_rdp
 	UINT64 outBytes;
 	UINT64 outPackets;
 	CRITICAL_SECTION critical;
+	CRITICAL_SECTION critical2;
 	rdpTransportIo* io;
 	void* ioContext;
 	HANDLE abortEvent;

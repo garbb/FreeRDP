@@ -2959,6 +2959,8 @@ static int input_message_process_input_class(rdpInputProxy* proxy, wMessage* msg
 	if (!proxy || !msg)
 		return -1;
 
+	// EnterCriticalSection(&proxy->input->context->rdp->critical2);
+
 	switch (type)
 	{
 		case Input_SynchronizeEvent:
@@ -3009,6 +3011,8 @@ static int input_message_process_input_class(rdpInputProxy* proxy, wMessage* msg
 			status = -1;
 			break;
 	}
+
+	// LeaveCriticalSection(&proxy->input->context->rdp->critical2);
 
 	return status;
 }

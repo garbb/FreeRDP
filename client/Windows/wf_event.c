@@ -284,8 +284,9 @@ static BOOL wf_scale_mouse_pos(wfContext* wfc, UINT16* x, UINT16* y)
 		return FALSE;
 
 	// mouse x,y coord from WM_MOUSEMOVE is actually signed, but x,y params for this func are unsigned
-	// so if they would have been negative, then just make them zero
-	// this is to avoid mouse position being sent as off of right side of screen when it is really off to left side
+	// and if mouse position is left of window or above window then x or y would be negative
+	// so interpret them as signed INT16 and if they would have been negative, then just make them zero
+	// this is to avoid mouse position being sent as off of right side of screen when it is really off to left side, and off of bottom when it is really off of top
 	if ( *(INT16 *)x < 0)
 		*x = 0;
 	if ( *(INT16 *)y < 0)

@@ -694,11 +694,13 @@ void rdp_print_errinfo(UINT32 code, rdpRdp* rdp)
 		if (code == errInfo->code)
 		{
 			WLog_INFO(TAG, "%s (0x%08" PRIX32 "):%s", errInfo->name, code, errInfo->info);
+
 #ifdef _WIN32
 			const char vIn[256];
+			// const char* vIn = malloc(256);
 			sprintf(vIn, "%s (0x%08" PRIX32 "):%s", errInfo->name, code, errInfo->info);
 			int requiredSize = mbstowcs(NULL, vIn, 0);
-			/* Add one to leave room for the null terminator */
+			// Add one to leave room for the null terminator
 			wchar_t* vOut = (wchar_t *)malloc( (requiredSize + 1) * sizeof( wchar_t ));
 			mbstowcs(vOut, vIn, requiredSize + 1);
 

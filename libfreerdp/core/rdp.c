@@ -1900,6 +1900,7 @@ rdpRdp* rdp_new(rdpContext* context)
 		return NULL;
 
 	InitializeCriticalSection(&rdp->critical);
+	InitializeCriticalSection(&rdp->critical2);
 	rdp->context = context;
 	flags = 0;
 
@@ -2125,6 +2126,7 @@ void rdp_free(rdpRdp* rdp)
 	if (rdp)
 	{
 		DeleteCriticalSection(&rdp->critical);
+		DeleteCriticalSection(&rdp->critical2);
 		rdp_reset_free(rdp);
 
 		freerdp_settings_free(rdp->settings);
