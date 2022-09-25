@@ -54,21 +54,23 @@ static BOOL wf_scale_mouse_event_ex(wfContext* wfc, UINT16 flags, UINT16 buttonM
 static BOOL g_flipping_in;
 static BOOL g_flipping_out;
 
+// need to track states of these keys within keyboard hook proc func since GetAsyncKeyState() does not work inside of it
 static BOOL alt_pressed = FALSE;
 static BOOL ctrl_pressed = FALSE;
+static BOOL shift_pressed = FALSE;
+static BOOL win_pressed = FALSE;
+
 static DWORD last_key_up = 0;
 static DWORD last_key_up_time = 0;
 static DWORD last_key_dn = 0;
 
 static LPARAM last_mousemove_lParam;
 
-static BOOL alt_ctrl_down()
+static BOOL mod_key_down()
 {
-	BOOL ret = (ctrl_pressed && alt_pressed);
-	//DEBUG_KBD("alt_ctrl_down() %d", ret);
-	//WLog_DBG("wf_event", "alt_ctrl_down() %d", ret);
-	//return ret;
-	return ((GetAsyncKeyState(VK_CONTROL) & 0x8000) || (GetAsyncKeyState(VK_MENU) & 0x8000));
+	return ((GetAsyncKeyState(VK_CONTROL) & 0x8000) || (GetAsyncKeyState(VK_MENU) & 0x8000) || (GetAsyncKeyState(VK_SHIFT) & 0x8000)
+	        || (GetAsyncKeyState(VK_LWIN) & 0x8000) || (GetAsyncKeyState(VK_RWIN) & 0x8000)
+			|| ctrl_pressed || alt_pressed || shift_pressed || win_pressed);
 }
 
 LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -85,7 +87,7 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 
 	if (g_flipping_in)
 	{
-		if (!alt_ctrl_down())
+		if (!mod_key_down())
 			g_flipping_in = FALSE;
 
 		return CallNextHookEx(NULL, nCode, wParam, lParam);
@@ -128,11 +130,18 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 				rdp_scancode = MAKE_RDP_SCANCODE((BYTE)p->scanCode, p->flags & LLKHF_EXTENDED);
 				DEBUG_KBD("keydown %d scanCode 0x%08lX flags 0x%08lX vkCode 0x%08lX",
 				          (wParam == WM_KEYDOWN), p->scanCode, p->flags, p->vkCode);
-				// DEBUG_KBD("GetAsyncKeyState(VK_CONTROL)=%d, GetAsyncKeyState(VK_MENU)=%d",
-				// GetAsyncKeyState(VK_CONTROL), GetAsyncKeyState(VK_MENU));
 
 				switch (p->vkCode)
 				{
+					case VK_LSHIFT:
+					case VK_RSHIFT:
+						shift_pressed = (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN);
+						break;
+					case VK_LWIN:
+					case VK_RWIN:
+						win_pressed = (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN);
+						break;
+					
 					case VK_LMENU:
 					case VK_RMENU:
 						alt_pressed = (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN);
@@ -146,7 +155,6 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 							if (p->time - last_key_up_time <= 250)
 							{
 								WLog_DBG("wf_event", "DEFOCUS");
-								// rdp_send_client_synchronize_pdu(wfc->common.context.rdp);
 								SetForegroundWindow(FindWindow(L"Shell_TrayWnd", NULL));
 							}
 						}
@@ -167,7 +175,6 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 							if (p->time - last_key_up_time <= 250)
 							{
 								WLog_DBG("wf_event", "DEFOCUS");
-								// rdp_send_client_synchronize_pdu(wfc->common.context.rdp);
 								SetForegroundWindow(FindWindow(L"Shell_TrayWnd", NULL));
 							}
 						}
@@ -209,7 +216,6 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 					if (wParam == WM_KEYDOWN)
 					{
 						wf_toggle_fullscreen(wfc);
-						// encomsp_toggle_control(wfc->encomsp);
 						return 1;
 					}
 				}
@@ -252,21 +258,35 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 					DEBUG_KBD(
 					    "lock keys are processed on client side too to toggle their indicators");
 				else
+				{
+					
+					if (g_flipping_out)
+					{
+						if (!mod_key_down())
+						{
+							WLog_DBG("wf_event", "if (g_flipping_out){...}");
+							g_flipping_out = FALSE;
+							g_focus_hWnd = NULL;
+							freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, TRUE);
+						}
+					}
+					
 					return 1;
+				}
 
 				break;
 		}
 	}
 
-	if (g_flipping_out)
-	{
-		if (!alt_ctrl_down())
-		{
-			WLog_DBG("wf_event", "if (g_flipping_out){...}");
-			g_flipping_out = FALSE;
-			g_focus_hWnd = NULL;
-		}
-	}
+	// if (g_flipping_out)
+	// {
+		// if (!mod_key_down())
+		// {
+			// WLog_DBG("wf_event", "if (g_flipping_out){...}");
+			// g_flipping_out = FALSE;
+			// g_focus_hWnd = NULL;
+		// }
+	// }
 
 	return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
@@ -897,30 +917,35 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 		case WM_SETFOCUS:
 			WLog_DBG("wf_event", "WM_SETFOCUS");
 			DEBUG_KBD("getting focus %X", hWnd);
-			freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, FALSE);
-			
-			// rdp_send_client_synchronize_pdu(wfc->common.context);
 
-			if (alt_ctrl_down())
+			if (mod_key_down())
+			{
+				WLog_DBG("wf_event", "set g_flipping_in");
 				g_flipping_in = TRUE;
+			}
 
 			g_focus_hWnd = hWnd;
 			freerdp_set_focus(wfc->common.context.instance);
+			freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, FALSE);
 			break;
 
 		case WM_KILLFOCUS:
 			WLog_DBG("wf_event", "WM_KILLFOCUS");
-			freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, TRUE);
 			if (g_focus_hWnd == hWnd && wfc && !wfc->fullscreen)
 			{
-				DEBUG_KBD("loosing focus %X", hWnd);
+				WLog_DBG("wf_event", "loosing focus %X", hWnd);
 
-				if (alt_ctrl_down())
+				if (mod_key_down())
+				{
+					WLog_DBG("wf_event", "set g_flipping_out");
 					g_flipping_out = TRUE;
+				}
 				else
+				{
 					g_focus_hWnd = NULL;
+					freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, TRUE);
+				}
 			}
-
 			break;
 
 		case WM_ACTIVATE:
@@ -930,19 +955,29 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 			if (activate != WA_INACTIVE)
 			{
-				if (alt_ctrl_down())
+				if (mod_key_down())
+				{
+					WLog_DBG("wf_event", "set g_flipping_in");
 					g_flipping_in = TRUE;
+				}
 
 				g_focus_hWnd = hWnd;
 			}
 			else
 			{
 				WLog_DBG("wf_event", "WM_ACTIVATE:WA_INACTIVE");
-				freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, TRUE);
-				if (alt_ctrl_down())
+				
+				if (mod_key_down())
+				{
+					WLog_DBG("wf_event", "set g_flipping_out");
 					g_flipping_out = TRUE;
+				}
 				else
+				{
 					g_focus_hWnd = NULL;
+					freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, TRUE);
+				}
+
 			}
 		}
 
