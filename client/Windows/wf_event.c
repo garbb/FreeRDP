@@ -65,9 +65,10 @@ static LPARAM last_mousemove_lParam;
 static BOOL alt_ctrl_down()
 {
 	BOOL ret = (ctrl_pressed && alt_pressed);
-	DEBUG_KBD("alt_ctrl_down() %d", ret);
-	return ret;
-	// return ((GetAsyncKeyState(VK_CONTROL) & 0x8000) || (GetAsyncKeyState(VK_MENU) & 0x8000));
+	//DEBUG_KBD("alt_ctrl_down() %d", ret);
+	//WLog_DBG("wf_event", "alt_ctrl_down() %d", ret);
+	//return ret;
+	return ((GetAsyncKeyState(VK_CONTROL) & 0x8000) || (GetAsyncKeyState(VK_MENU) & 0x8000));
 }
 
 LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -144,7 +145,7 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 							last_key_up = 0;
 							if (p->time - last_key_up_time <= 250)
 							{
-								DEBUG_KBD("DEFOCUS");
+								WLog_DBG("wf_event", "DEFOCUS");
 								// rdp_send_client_synchronize_pdu(wfc->common.context.rdp);
 								SetForegroundWindow(FindWindow(L"Shell_TrayWnd", NULL));
 							}
@@ -165,7 +166,7 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 							last_key_up = 0;
 							if (p->time - last_key_up_time <= 250)
 							{
-								DEBUG_KBD("DEFOCUS");
+								WLog_DBG("wf_event", "DEFOCUS");
 								// rdp_send_client_synchronize_pdu(wfc->common.context.rdp);
 								SetForegroundWindow(FindWindow(L"Shell_TrayWnd", NULL));
 							}
