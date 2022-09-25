@@ -691,7 +691,12 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 			case WM_SETCURSOR:
 				if (LOWORD(lParam) == HTCLIENT)
-					if (g_focus_hWnd) SetCursor(wfc->cursor);
+					{
+						if (g_focus_hWnd) 
+							SetCursor(wfc->cursor);
+					    else
+							DefWindowProc(hWnd, Msg, wParam, lParam);
+					}
 				else
 					DefWindowProc(hWnd, Msg, wParam, lParam);
 
