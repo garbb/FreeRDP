@@ -691,13 +691,8 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 #endif
 
 			case WM_SETCURSOR:
-				if (LOWORD(lParam) == HTCLIENT)
-					{
-						if (g_focus_hWnd) 
-							SetCursor(wfc->cursor);
-					    else
-							DefWindowProc(hWnd, Msg, wParam, lParam);
-					}
+				if (LOWORD(lParam) == HTCLIENT && g_focus_hWnd)
+					SetCursor(wfc->cursor);
 				else
 					DefWindowProc(hWnd, Msg, wParam, lParam);
 
@@ -895,12 +890,12 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 	switch (Msg)
 	{
 		case WM_DESTROY:
-			WLog_VRB("wf_event", "WM_DESTROY");
+			WLog_DBG("wf_event", "WM_DESTROY");
 			PostQuitMessage(WM_QUIT);
 			break;
 
 		case WM_SETFOCUS:
-			WLog_VRB("wf_event", "WM_SETFOCUS");
+			WLog_DBG("wf_event", "WM_SETFOCUS");
 			DEBUG_KBD("getting focus %X", hWnd);
 			freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, FALSE);
 			
@@ -914,7 +909,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 			break;
 
 		case WM_KILLFOCUS:
-			WLog_VRB("wf_event", "WM_KILLFOCUS");
+			WLog_DBG("wf_event", "WM_KILLFOCUS");
 			freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, TRUE);
 			if (g_focus_hWnd == hWnd && wfc && !wfc->fullscreen)
 			{
@@ -930,7 +925,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 		case WM_ACTIVATE:
 		{
-			WLog_VRB("wf_event", "WM_ACTIVATE");
+			WLog_DBG("wf_event", "WM_ACTIVATE");
 			int activate = (int)(short)LOWORD(wParam);
 
 			if (activate != WA_INACTIVE)
@@ -942,6 +937,8 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 			}
 			else
 			{
+				WLog_DBG("wf_event", "WM_ACTIVATE:WA_INACTIVE");
+				freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, TRUE);
 				if (alt_ctrl_down())
 					g_flipping_out = TRUE;
 				else
