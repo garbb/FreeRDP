@@ -1186,6 +1186,8 @@ static void update_write_suppress_output(wStream* s, BYTE allow, const RECTANGLE
 
 static BOOL update_send_suppress_output(rdpContext* context, BYTE allow, const RECTANGLE_16* area)
 {
+	WLog_WARN(TAG, "update_send_suppress_output");
+	
 	rdpRdp* rdp = context->rdp;
 
 	if (rdp->settings->SuppressOutput)

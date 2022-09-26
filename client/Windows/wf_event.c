@@ -955,13 +955,13 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 			if (activate != WA_INACTIVE)
 			{
-				if (mod_key_down())
-				{
-					WLog_DBG("wf_event", "set g_flipping_in");
-					g_flipping_in = TRUE;
-				}
+				// if (mod_key_down())
+				// {
+					// WLog_DBG("wf_event", "set g_flipping_in");
+					// g_flipping_in = TRUE;
+				// }
 
-				g_focus_hWnd = hWnd;
+				// g_focus_hWnd = hWnd;
 			}
 			else
 			{
