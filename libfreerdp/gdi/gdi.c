@@ -1365,6 +1365,8 @@ void gdi_free(freerdp* instance)
 
 BOOL gdi_send_suppress_output(rdpGdi* gdi, BOOL suppress)
 {
+	WLog_ERR(TAG, "gdi_send_suppress_output %x", suppress);
+	
 	RECTANGLE_16 rect;
 	rdpSettings* settings;
 	rdpUpdate* update;

@@ -553,7 +553,7 @@ BOOL rdp_read_header(rdpRdp* rdp, wStream* s, UINT16* length, UINT16* channelId)
 	if (!per_read_length(s, length)) /* userData (OCTET_STRING) */
 		return FALSE;
 
-	WLog_DBG(
+	WLog_VRB(
 	    TAG,
 	    "rdp_read_header code=%x li=%x choice=%d domainMCSPDU=%d byte=%x length=%d initiator=%d",
 	    code, li, choice, domainMCSPDU, byte, length, initiator);
@@ -1408,7 +1408,7 @@ const char* pdu_type_to_str(UINT16 pduType)
 
 static int rdp_recv_tpkt_pdu(rdpRdp* rdp, wStream* s)
 {
-	WLog_DBG(TAG, "rdp_recv_tpkt_pdu");
+	WLog_VRB(TAG, "rdp_recv_tpkt_pdu");
 
 	int rc = 0;
 	UINT16 length;
@@ -1428,7 +1428,7 @@ static int rdp_recv_tpkt_pdu(rdpRdp* rdp, wStream* s)
 	if (!rdp_read_header(rdp, s, &length, &channelId))
 		return -1;
 
-	WLog_DBG(TAG, "rdp_recv_tpkt_pdu channelId=%d", channelId);
+	WLog_VRB(TAG, "rdp_recv_tpkt_pdu channelId=%d", channelId);
 
 	if (freerdp_shall_disconnect_context(rdp->context))
 		return 0;

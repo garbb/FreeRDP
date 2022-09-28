@@ -65,6 +65,7 @@ static DWORD last_key_up_time = 0;
 static DWORD last_key_dn = 0;
 
 static LPARAM last_mousemove_lParam;
+static WPARAM last_NCACTIVATE_wParam;
 
 static BOOL mod_key_down()
 {
@@ -916,21 +917,32 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 		case WM_SETFOCUS:
 			WLog_DBG("wf_event", "WM_SETFOCUS");
+			// GetActiveWindow(); GetFocus()
+			// WLog_DBG("wf_event", "hWnd=%x, wfc->hwnd=%x, GetActiveWindow()=%x, GetFocus()=%x", hWnd, wfc->hwnd, GetActiveWindow(), GetFocus());
+			// SetActiveWindow(wfc->hwnd);
+			// SetFocus(wfc->hwnd);
+			// SetForegroundWindow(wfc->hwnd);
+			// BringWindowToTop(wfc->hwnd);
 			DEBUG_KBD("getting focus %X", hWnd);
 
-			if (mod_key_down())
+			if (last_NCACTIVATE_wParam)
 			{
-				WLog_DBG("wf_event", "set g_flipping_in");
-				g_flipping_in = TRUE;
-			}
+				if (mod_key_down())
+				{
+					WLog_DBG("wf_event", "set g_flipping_in");
+					g_flipping_in = TRUE;
+				}
 
-			g_focus_hWnd = hWnd;
-			freerdp_set_focus(wfc->common.context.instance);
-			freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, FALSE);
+				g_focus_hWnd = hWnd;
+				freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, FALSE);
+				freerdp_set_focus(wfc->common.context.instance);
+			}
 			break;
 
 		case WM_KILLFOCUS:
 			WLog_DBG("wf_event", "WM_KILLFOCUS");
+			// WLog_DBG("wf_event", "hWnd=%x, wfc->hwnd=%x, GetActiveWindow()=%x, GetFocus()=%x", hWnd, wfc->hwnd, GetActiveWindow(), GetFocus());
+			
 			if (g_focus_hWnd == hWnd && wfc && !wfc->fullscreen)
 			{
 				WLog_DBG("wf_event", "loosing focus %X", hWnd);
@@ -947,7 +959,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 				}
 			}
 			break;
-
+/*
 		case WM_ACTIVATE:
 		{
 			WLog_DBG("wf_event", "WM_ACTIVATE");
@@ -955,6 +967,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 			if (activate != WA_INACTIVE)
 			{
+				// for some reason get this upon minimize via task bar click...
 				// if (mod_key_down())
 				// {
 					// WLog_DBG("wf_event", "set g_flipping_in");
@@ -980,6 +993,64 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 			}
 		}
+*/
+
+		case WM_NCACTIVATE:
+
+			WLog_DBG("wf_event", "WM_NCACTIVATE");
+			
+			last_NCACTIVATE_wParam = wParam;
+			
+			if (wParam)
+			{
+				WLog_DBG("wf_event", "WM_NCACTIVATE:fActive=true");
+				
+				if (mod_key_down())
+				{
+					WLog_DBG("wf_event", "set g_flipping_in");
+					g_flipping_in = TRUE;
+				}
+
+				g_focus_hWnd = hWnd;
+				freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, FALSE);
+				freerdp_set_focus(wfc->common.context.instance);
+				
+			}
+/*
+			if (!wParam)
+			{
+				WLog_DBG("wf_event", "WM_NCACTIVATE:fActive=false");
+				WLog_DBG("wf_event", "loosing focus %X", hWnd);
+
+				if (mod_key_down())
+				{
+					WLog_DBG("wf_event", "set g_flipping_out");
+					g_flipping_out = TRUE;
+				}
+				else
+				{
+					g_focus_hWnd = NULL;
+					freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, TRUE);
+				}
+			}
+			else
+			{
+				WLog_DBG("wf_event", "WM_NCACTIVATE:fActive=true");
+				
+				if (mod_key_down())
+				{
+					WLog_DBG("wf_event", "set g_flipping_in");
+					g_flipping_in = TRUE;
+				}
+
+				g_focus_hWnd = hWnd;
+				freerdp_set_focus(wfc->common.context.instance);
+				freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, FALSE);
+				
+			}
+*/
+			return DefWindowProc(hWnd, Msg, wParam, lParam);
+			break;
 
 		default:
 			return DefWindowProc(hWnd, Msg, wParam, lParam);
