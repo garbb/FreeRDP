@@ -81,15 +81,25 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 	wfContext* wfc = NULL;
 	DWORD rdp_scancode;
 	rdpInput* input;
-	PKBDLLHOOKSTRUCT p;
+	PKBDLLHOOKSTRUCT p = (PKBDLLHOOKSTRUCT)lParam;
 	if (g_focus_hWnd)
-		DEBUG_KBD("Low-level keyboard hook, hWnd %X nCode %X wParam %X", g_focus_hWnd, nCode,
-		          wParam);
+	{
+		DEBUG_KBD("Low-level keyboard hook, hWnd %X nCode %X wParam %X", g_focus_hWnd, nCode, wParam);
+		// WLog_DBG("wf_event", "Low-level keyboard hook, hWnd %X vkCode %X wParam %X", g_focus_hWnd, p->vkCode, wParam);
+	}
 
+	// basically pass along the first keyup message to OS instead of having hook eat it so that OS keystate is not out of sync
 	if (g_flipping_in)
 	{
-		if (!mod_key_down())
+		// if (!mod_key_down())
+		if ((
+				// ((p->vkCode==VK_LSHIFT||p->vkCode==VK_LSHIFT) && wParam==WM_KEYUP) ||
+				(wParam==WM_KEYUP || wParam==WM_SYSKEYUP)
+			))
+		{
+			WLog_DBG("wf_event", "set g_flipping_in = FALSE");
 			g_flipping_in = FALSE;
+		}
 
 		return CallNextHookEx(NULL, nCode, wParam, lParam);
 	}
@@ -122,7 +132,7 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 
 				if (!wfc)
 					wfc = (wfContext*)GetWindowLongPtr(g_focus_hWnd, GWLP_USERDATA);
-				p = (PKBDLLHOOKSTRUCT)lParam;
+				// p = (PKBDLLHOOKSTRUCT)lParam;
 
 				if (!wfc || !p)
 					return 1;
