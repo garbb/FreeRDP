@@ -26,7 +26,7 @@
 #include "errinfo.h"
 
 #ifdef _WIN32
-#include "../client/Windows/wf_client.h"
+#include "../../client/Windows/wf_client.h"
 #include <freerdp/freerdp.h>
 #include "rdp.h"
 #endif
@@ -699,15 +699,9 @@ void rdp_print_errinfo(UINT32 code, rdpRdp* rdp)
 			const char vIn[256];
 			// const char* vIn = malloc(256);
 			sprintf(vIn, "%s (0x%08" PRIX32 "):%s", errInfo->name, code, errInfo->info);
-			int requiredSize = mbstowcs(NULL, vIn, 0);
-			// Add one to leave room for the null terminator
-			wchar_t* vOut = (wchar_t *)malloc( (requiredSize + 1) * sizeof( wchar_t ));
-			mbstowcs(vOut, vIn, requiredSize + 1);
-
-			// MessageBoxW(NULL,
-			MessageBoxW(((wfContext*)rdp->context)->hwnd,
-			           vOut, L"wfreerdp",
-			           MB_ICONERROR | MB_SETFOREGROUND);
+			wf_error_msgbox(((wfContext*)rdp->context)->hwnd,
+			                rdp->settings->WindowTitle,
+			                vIn, MB_ICONERROR | MB_SETFOREGROUND);
 #endif
 			return;
 		}

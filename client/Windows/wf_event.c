@@ -928,7 +928,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 		case WM_SETFOCUS:
 			WLog_DBG("wf_event", "WM_SETFOCUS");
 			// GetActiveWindow(); GetFocus()
-			// WLog_DBG("wf_event", "hWnd=%x, wfc->hwnd=%x, GetActiveWindow()=%x, GetFocus()=%x", hWnd, wfc->hwnd, GetActiveWindow(), GetFocus());
+			// WLog_DBG("wf_event", "hWnd=%x, wfc->hwnd=%x, GetForegroundWindow()=%x, GetActiveWindow()=%x, GetFocus()=%x", hWnd, wfc->hwnd, GetForegroundWindow(), GetActiveWindow(), GetFocus());
 			// SetActiveWindow(wfc->hwnd);
 			// SetFocus(wfc->hwnd);
 			// SetForegroundWindow(wfc->hwnd);
@@ -1026,39 +1026,6 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 				freerdp_set_focus(wfc->common.context.instance);
 				
 			}
-/*
-			if (!wParam)
-			{
-				WLog_DBG("wf_event", "WM_NCACTIVATE:fActive=false");
-				WLog_DBG("wf_event", "loosing focus %X", hWnd);
-
-				if (mod_key_down())
-				{
-					WLog_DBG("wf_event", "set g_flipping_out");
-					g_flipping_out = TRUE;
-				}
-				else
-				{
-					g_focus_hWnd = NULL;
-					freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, TRUE);
-				}
-			}
-			else
-			{
-				WLog_DBG("wf_event", "WM_NCACTIVATE:fActive=true");
-				
-				if (mod_key_down())
-				{
-					WLog_DBG("wf_event", "set g_flipping_in");
-					g_flipping_in = TRUE;
-				}
-
-				g_focus_hWnd = hWnd;
-				freerdp_set_focus(wfc->common.context.instance);
-				freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, FALSE);
-				
-			}
-*/
 			return DefWindowProc(hWnd, Msg, wParam, lParam);
 			break;
 

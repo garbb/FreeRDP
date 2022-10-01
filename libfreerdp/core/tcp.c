@@ -1177,13 +1177,8 @@ int freerdp_tcp_default_connect(rdpContext* context, rdpSettings* settings, cons
 #ifdef _WIN32
 			const char vIn[256];
 			sprintf(vIn, "failed to connect to %s", hostname);
-			int requiredSize = mbstowcs(NULL, vIn, 0);
-			/* Add one to leave room for the null terminator */
-			wchar_t* vOut = (wchar_t *)malloc( (requiredSize + 1) * sizeof( wchar_t ));
-			mbstowcs(vOut, vIn, requiredSize + 1);
-			MessageBoxW(NULL,
-			           vOut, L"wfreerdp",
-			           MB_ICONERROR | MB_SETFOREGROUND);
+			wf_error_msgbox(NULL, settings->WindowTitle,
+			                vIn, MB_ICONERROR | MB_SETFOREGROUND);
 #endif
 				
 				return -1;
@@ -1206,14 +1201,8 @@ int freerdp_tcp_default_connect(rdpContext* context, rdpSettings* settings, cons
 		WLog_ERR(TAG, "Couldn't get socket ip address");
 		
 #ifdef _WIN32
-			const char* vIn = "Couldn't get socket ip address";
-			int requiredSize = mbstowcs(NULL, vIn, 0);
-			/* Add one to leave room for the null terminator */
-			wchar_t* vOut = (wchar_t *)malloc( (requiredSize + 1) * sizeof( wchar_t ));
-			mbstowcs(vOut, vIn, requiredSize + 1);
-			MessageBoxW(NULL,
-			           vOut, L"wfreerdp",
-			           MB_ICONERROR | MB_SETFOREGROUND);
+			wf_error_msgbox(NULL, settings->WindowTitle,
+			                "Couldn't get socket ip address", MB_ICONERROR | MB_SETFOREGROUND);
 #endif
 		
 		return -1;

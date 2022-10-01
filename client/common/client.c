@@ -58,7 +58,7 @@
 #define TAG CLIENT_TAG("common")
 
 #ifdef _WIN32
-#include "../client/Windows/wf_client.h"
+#include "../Windows/wf_client.h"
 #endif
 
 static BOOL freerdp_client_common_new(freerdp* instance, rdpContext* context)
@@ -929,9 +929,9 @@ BOOL client_auto_reconnect_ex(freerdp* instance, BOOL (*window_events)(freerdp* 
 	{
 		
 #ifdef _WIN32
-			MessageBox(((wfContext*)instance->context)->hwnd,
-			           L"Network Disconnect", L"wfreerdp",
-			           MB_ICONERROR | MB_SETFOREGROUND);
+			wf_error_msgbox(((wfContext*)instance->context)->hwnd, settings->WindowTitle,
+			                "Network Disconnect",
+			                MB_ICONERROR | MB_SETFOREGROUND);
 #endif
 		/* No auto-reconnect - just quit */
 		return FALSE;

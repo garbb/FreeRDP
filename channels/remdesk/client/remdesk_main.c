@@ -351,9 +351,9 @@ static UINT remdesk_recv_ctl_result_pdu(remdeskPlugin* remdesk, wStream* s,
 			WLog_DBG(TAG, "remote assistance connection request was denied");
 
 #ifdef _WIN32
-			MessageBox(((wfContext*)remdesk->rdpcontext)->hwnd,
-			           L"Remote assistance connection request was denied", L"Remote Assistance",
-			           MB_ICONERROR | MB_SETFOREGROUND);
+			wf_error_msgbox(((wfContext*)remdesk->rdpcontext)->hwnd, remdesk->rdpcontext->settings->WindowTitle,
+			                "Remote assistance connection request was denied",
+			                MB_ICONERROR | MB_SETFOREGROUND);
 #endif
 			return ERROR_CONNECTION_REFUSED;
 			break;

@@ -1476,3 +1476,20 @@ int RdpClientEntry(RDP_CLIENT_ENTRY_POINTS* pEntryPoints)
 	pEntryPoints->ClientStop = wfreerdp_client_stop;
 	return 0;
 }
+
+static wchar_t* wf_mbstowcs(const char* str)
+{
+	size_t requiredSize = mbstowcs(NULL, str, 0);
+	// Add one to leave room for the null terminator
+	wchar_t* mbstext = (wchar_t *)malloc( (requiredSize + 1) * sizeof( wchar_t ));
+	mbstowcs(mbstext, str, requiredSize + 1);
+	return mbstext;
+}
+
+int wf_error_msgbox(HWND hWnd, const char* title, const char* text, UINT uType)
+{
+	if (!text)
+		return 0;
+
+	return MessageBoxW(hWnd, wf_mbstowcs(text), title ? wf_mbstowcs(title) : L"wfreerdp", uType);
+}
