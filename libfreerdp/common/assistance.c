@@ -35,6 +35,10 @@
 
 #include <freerdp/assistance.h>
 
+#ifdef _WIN32
+#include "../../client/Windows/wf_client.h"
+#endif
+
 #define TAG FREERDP_TAG("common")
 
 struct rdp_assistance_file
@@ -1118,7 +1122,7 @@ int freerdp_assistance_parse_file_buffer(rdpAssistanceFile* file, const char* bu
 #ifdef _WIN32
 			wf_error_msgbox(NULL, "Remote Assistance",
 			                "freerdp_assistance_parse_connection_string1 failure.\nMaybe incorrect assistance password?",
-							MB_ICONERROR | MB_SETFOREGROUND);
+			                MB_ICONERROR | MB_SETFOREGROUND);
 #endif
 			return -1;
 		}

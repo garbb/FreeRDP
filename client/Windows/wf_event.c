@@ -357,6 +357,8 @@ static BOOL wf_scale_mouse_pos(wfContext* wfc, UINT16* x, UINT16* y)
 
 void wf_event_focus_in(wfContext* wfc)
 {
+	WLog_DBG("wf_event", "wf_event_focus_in");
+	
 	UINT16 syncFlags;
 	rdpInput* input;
 	POINT pt;
@@ -377,6 +379,14 @@ void wf_event_focus_in(wfContext* wfc)
 		syncFlags |= KBD_SYNC_KANA_LOCK;
 
 	input->FocusInEvent(input, syncFlags);
+
+	// only if assistance mode and server key state does not match client keystate
+	// if (GetKeyState(VK_CAPITAL))
+	// {
+		// freerdp_input_send_keyboard_event_ex(input, TRUE, RDP_SCANCODE_CAPSLOCK);
+		// freerdp_input_send_keyboard_event_ex(input, FALSE, RDP_SCANCODE_CAPSLOCK);
+	// }
+
 	/* send pointer position if the cursor is currently inside our client area */
 	GetCursorPos(&pt);
 	ScreenToClient(wfc->hwnd, &pt);

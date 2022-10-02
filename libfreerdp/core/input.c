@@ -264,6 +264,8 @@ static BOOL input_send_extended_mouse_event(rdpInput* input, UINT16 flags, UINT1
 
 static BOOL input_send_focus_in_event(rdpInput* input, UINT16 toggleStates)
 {
+	WLog_DBG(TAG, "input_send_focus_in_event toggleStates=%x", toggleStates);
+
 	/* send a tab up like mstsc.exe */
 	if (!input_send_keyboard_event(input, KBD_FLAGS_RELEASE, 0x0f))
 		return FALSE;
@@ -486,6 +488,8 @@ static BOOL input_send_fastpath_extended_mouse_event(rdpInput* input, UINT16 fla
 
 static BOOL input_send_fastpath_focus_in_event(rdpInput* input, UINT16 toggleStates)
 {
+	WLog_DBG(TAG, "input_send_fastpath_focus_in_event toggleStates=%x", toggleStates);	
+
 	EnterCriticalSection(&input->context->rdp->critical2);
 
 	wStream* s;
@@ -572,6 +576,8 @@ static BOOL input_send_fastpath_keyboard_pause_event(rdpInput* input)
 
 static BOOL input_recv_sync_event(rdpInput* input, wStream* s)
 {
+	WLog_DBG(TAG, "input_recv_sync_event");
+
 	UINT32 toggleFlags;
 
 	WINPR_ASSERT(input);
@@ -866,6 +872,8 @@ BOOL freerdp_input_send_extended_mouse_event(rdpInput* input, UINT16 flags, UINT
 
 BOOL freerdp_input_send_focus_in_event(rdpInput* input, UINT16 toggleStates)
 {
+	WLog_DBG(TAG, "freerdp_input_send_focus_in_event toggleStates=%x", toggleStates);
+	
 	if (!input || !input->context)
 		return FALSE;
 
