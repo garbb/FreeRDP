@@ -852,6 +852,8 @@ static BOOL rdp_recv_server_shutdown_denied_pdu(rdpRdp* rdp, wStream* s)
 
 static BOOL rdp_recv_server_set_keyboard_indicators_pdu(rdpRdp* rdp, wStream* s)
 {
+	WLog_DBG(TAG, "rdp_recv_server_set_keyboard_indicators_pdu");
+
 	UINT16 unitId;
 	UINT16 ledFlags;
 

@@ -264,24 +264,21 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 
 				freerdp_input_send_keyboard_event_ex(input, !(p->flags & LLKHF_UP), rdp_scancode);
 
-				if (p->vkCode == VK_NUMLOCK || p->vkCode == VK_CAPITAL || p->vkCode == VK_SCROLL ||
-				    p->vkCode == VK_KANA)
+				if ((p->vkCode == VK_NUMLOCK || p->vkCode == VK_CAPITAL || p->vkCode == VK_SCROLL ||
+				    p->vkCode == VK_KANA) && !wfc->common.context.settings->RemoteAssistanceMode) // assistance mode won't sync lock key states correctly so only send these key events to server
 					DEBUG_KBD(
 					    "lock keys are processed on client side too to toggle their indicators");
 				else
 				{
-					
-					if (g_flipping_out)
+
+					if (g_flipping_out && !mod_key_down())
 					{
-						if (!mod_key_down())
-						{
-							WLog_DBG("wf_event", "if (g_flipping_out){...}");
-							g_flipping_out = FALSE;
-							g_focus_hWnd = NULL;
-							freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, TRUE);
-						}
+						WLog_DBG("wf_event", "if (g_flipping_out){...}");
+						g_flipping_out = FALSE;
+						g_focus_hWnd = NULL;
+						freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, TRUE);
 					}
-					
+
 					return 1;
 				}
 

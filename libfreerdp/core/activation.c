@@ -84,6 +84,8 @@ BOOL rdp_send_server_synchronize_pdu(rdpRdp* rdp)
 
 BOOL rdp_recv_client_synchronize_pdu(rdpRdp* rdp, wStream* s)
 {
+	WLog_DBG(TAG, "rdp_recv_client_synchronize_pdu");
+
 	UINT16 messageType;
 
 	WINPR_ASSERT(rdp);
