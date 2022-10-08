@@ -1018,20 +1018,22 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 			
 			last_NCACTIVATE_wParam = wParam;
 			
-			if (wParam && (wfc->hwnd == GetForegroundWindow()))
+			if (wParam)
 			{
 				WLog_DBG("wf_event", "WM_NCACTIVATE:fActive=true");
 				
-				if (mod_key_down())
+				if (wfc->hwnd == GetForegroundWindow())
 				{
-					WLog_DBG("wf_event", "set g_flipping_in");
-					g_flipping_in = TRUE;
-				}
+					if (mod_key_down())
+					{
+						WLog_DBG("wf_event", "set g_flipping_in");
+						g_flipping_in = TRUE;
+					}
 
-				g_focus_hWnd = hWnd;
-				freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, FALSE);
-				freerdp_set_focus(wfc->common.context.instance);
-				
+					g_focus_hWnd = hWnd;
+					freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, FALSE);
+					freerdp_set_focus(wfc->common.context.instance);
+				}
 			}
 			return DefWindowProc(hWnd, Msg, wParam, lParam);
 			break;
