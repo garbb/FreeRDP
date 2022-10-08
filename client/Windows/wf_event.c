@@ -1018,7 +1018,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 			
 			last_NCACTIVATE_wParam = wParam;
 			
-			if (wParam && (wfc->hwnd == GetForegroundWindow()))
+			if (wParam)
 			{
 				WLog_DBG("wf_event", "WM_NCACTIVATE:fActive=true");
 				
