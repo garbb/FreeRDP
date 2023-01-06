@@ -1014,7 +1014,7 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 
 		case WM_NCACTIVATE:
 
-			WLog_DBG("wf_event", "WM_NCACTIVATE");
+			// WLog_DBG("wf_event", "WM_NCACTIVATE");
 			
 			last_NCACTIVATE_wParam = wParam;
 			
@@ -1034,6 +1034,25 @@ LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 					freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, FALSE);
 					freerdp_set_focus(wfc->common.context.instance);
 				}
+			} else {
+				WLog_DBG("wf_event", "WM_NCACTIVATE:fActive=false");
+				
+				if (g_focus_hWnd == hWnd && wfc && !wfc->fullscreen)
+				{
+					WLog_DBG("wf_event", "loosing focus %X", hWnd);
+
+					if (mod_key_down())
+					{
+						WLog_DBG("wf_event", "set g_flipping_out");
+						g_flipping_out = TRUE;
+					}
+					else
+					{
+						g_focus_hWnd = NULL;
+						freerdp_settings_set_bool(wfc->common.context.settings, FreeRDP_SuspendInput, TRUE);
+					}
+				}
+				
 			}
 			return DefWindowProc(hWnd, Msg, wParam, lParam);
 			break;
