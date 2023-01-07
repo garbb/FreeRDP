@@ -179,7 +179,7 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 						DEBUG_KBD("ctrl_pressed=%d", ctrl_pressed);
 
 						if ((wParam == WM_SYSKEYUP || wParam == WM_KEYUP) &&
-						    (last_key_up == VK_LMENU || last_key_up == VK_LMENU) && !alt_pressed &&
+						    (last_key_up == VK_LMENU || last_key_up == VK_RMENU) && !alt_pressed &&
 						    !last_key_dn)
 						{
 							last_key_up = 0;
@@ -210,7 +210,7 @@ LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam)
 				{
 					// any key other than CTRL or ALT
 					if (!(p->vkCode == VK_LCONTROL || p->vkCode == VK_RCONTROL ||
-					      p->vkCode == VK_LMENU || p->vkCode == VK_LMENU))
+					      p->vkCode == VK_LMENU || p->vkCode == VK_RMENU))
 					{
 						last_key_dn = p->vkCode;
 						DEBUG_KBD("set last_key_dn=0x%08lX", last_key_dn);
